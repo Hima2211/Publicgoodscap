@@ -76,22 +76,6 @@ export default function Header() {
           </div>
         </div>
         
-        {/* Tabs navigation */}
-        <div className="flex border-b border-darkBorder overflow-x-auto">
-          <Button variant="ghost" className="flex-1 rounded-none border-b-2 border-accent text-white py-3 px-2">
-            Projects
-          </Button>
-          <Button variant="ghost" className="flex-1 rounded-none border-b-0 text-darkText py-3 px-2">
-            Watchlist
-          </Button>
-          <Button variant="ghost" className="flex-1 rounded-none border-b-0 text-darkText py-3 px-2">
-            Overview
-          </Button>
-          <Button variant="ghost" className="flex-1 rounded-none border-b-0 text-darkText py-3 px-2">
-            Funding
-          </Button>
-        </div>
-        
         {/* Simple category navigation bar */}
         <div className="md:hidden bg-darkBg">
           <div className="overflow-x-auto flex space-x-2 p-2 min-w-max border-b border-darkBorder">
@@ -128,27 +112,8 @@ export default function Header() {
           </div>
         </div>
         
-        {/* Filters row */}
-        <div className="flex items-center justify-between border-b border-darkBorder px-4 py-2">
-          <div className="flex items-center">
-            <span className="text-white text-sm">USD</span>
-            <span className="mx-1 text-darkText">/</span>
-            <span className="text-accent text-sm">TOP</span>
-          </div>
-          
-          <div className="flex space-x-2">
-            <Button variant="outline" size="sm" className="text-xs rounded-full border-darkBorder bg-darkCard">
-              Top 100 <svg className="ml-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs rounded-full border-darkBorder bg-darkCard">
-              <span className="text-white">24h %</span> <svg className="ml-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </Button>
-          </div>
-          
+        {/* Menu Button */}
+        <div className="flex items-center justify-end border-b border-darkBorder px-4 py-2">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8 text-white">
@@ -201,14 +166,6 @@ export default function Header() {
               </div>
             </SheetContent>
           </Sheet>
-        </div>
-        
-        {/* Table header */}
-        <div className="flex items-center justify-between border-b border-darkBorder px-4 py-2 text-xs text-darkText">
-          <span className="w-8">#</span>
-          <span className="flex-1">Market Cap</span>
-          <span className="w-24 text-right">Price</span>
-          <span className="w-16 text-right">24h %</span>
         </div>
       </div>
       
