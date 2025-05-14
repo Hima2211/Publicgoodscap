@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 20 14.3% 4.1%;
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 25 5.3% 44.7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14.3% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14.3% 4.1%;
+    --border: 20 5.9% 90%;
+    --input: 20 5.9% 90%;
+    --primary: 207 90% 54%;
+    --primary-foreground: 211 100% 99%;
+    --secondary: 60 4.8% 95.9%;
+    --secondary-foreground: 24 9.8% 10%;
+    --accent: 60 4.8% 95.9%;
+    --accent-foreground: 24 9.8% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9.1% 97.8%;
+    --ring: 20 14.3% 4.1%;
+    --radius: 0.5rem;
+    
+    /* Chart colors */
+    --chart-1: 221 83% 53%;
+    --chart-2: 262 83% 58%;
+    --chart-3: 291 64% 42%;
+    --chart-4: 322 75% 46%;
+    --chart-5: 199 89% 48%;
+
+    /* Custom variables for our theme */
+    --darkBg: 240 10% 8%;
+    --darkCard: 240 10% 14%;
+    --darkBorder: 240 10% 20%;
+    --darkText: 220 14% 62%;
+    --lightText: 214 32% 91%;
+    --primary-color: 252 56% 57%;
+    --secondary-color: 262 83% 58%;
+    --accent-color: 187 92% 53%;
+    --success-color: 158 64% 40%;
+    --warning-color: 37 92% 50%;
+    --danger-color: 0 84% 60%;
+  }
+
+  .dark {
+    --background: var(--darkBg);
+    --foreground: var(--lightText);
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: var(--darkText);
+    --popover: var(--darkCard);
+    --popover-foreground: var(--lightText);
+    --card: var(--darkCard);
+    --card-foreground: var(--lightText);
+    --border: var(--darkBorder);
+    --input: var(--darkBorder);
+    --primary: var(--primary-color);
+    --primary-foreground: 0 0% 98%;
+    --secondary: var(--secondary-color);
+    --secondary-foreground: 0 0% 98%;
+    --accent: var(--accent-color);
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --ring: 240 4.9% 83.9%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans bg-darkBg text-foreground;
+  }
+}
+
+@layer components {
+  .progress-bar {
+    @apply bg-darkBorder bg-opacity-20 rounded-full h-1.5 relative overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply absolute left-0 top-0 h-full rounded-full transition-all duration-500 ease-in-out;
+  }
+  
+  .table-container {
+    @apply scrollbar-thin;
+  }
+  
+  .project-card {
+    @apply transition-all duration-200;
+  }
+  
+  .project-card:hover {
+    @apply -translate-y-1 shadow-card;
+  }
+  
+  .fund-button {
+    @apply transition-all duration-200;
+  }
+  
+  .fund-button:hover {
+    @apply scale-105;
+  }
+  
+  .social-icon {
+    @apply transition-all duration-150;
+  }
+  
+  .social-icon:hover {
+    @apply -translate-y-0.5;
+  }
+  
+  .badge {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+  
+  .badge-defi {
+    @apply bg-secondary/20 text-secondary;
+  }
+  
+  .badge-nft {
+    @apply bg-accent/20 text-accent;
+  }
+  
+  .badge-dao {
+    @apply bg-warning/20 text-warning;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(60, 60, 80, 0.6) rgba(20, 20, 30, 0.3);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgba(20, 20, 30, 0.3);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(60, 60, 80, 0.6);
+    border-radius: 20px;
+  }
+}
