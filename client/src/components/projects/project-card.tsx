@@ -116,16 +116,16 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <div className="project-card bg-darkCard rounded-xl overflow-hidden border border-darkBorder shadow-card">
       {/* Project Header */}
-      <div className="p-5 flex items-start gap-3">
+      <div className="p-4 flex items-start gap-3">
         <img 
           src={project.logo} 
           alt={`${project.name} logo`} 
-          className="w-12 h-12 rounded-lg flex-shrink-0 object-cover" 
+          className="w-10 h-10 rounded-lg flex-shrink-0 object-cover" 
         />
         
         <div className="overflow-hidden">
           <div className="flex items-center gap-2">
-            <h3 className="font-bold text-lg text-white truncate">{project.name}</h3>
+            <h3 className="font-bold text-base text-white truncate">{project.name}</h3>
             <span className={`badge ${categoryClass} text-xs`}>{getCategoryName(project.category)}</span>
           </div>
           <p className="text-darkText text-sm line-clamp-2">
@@ -135,8 +135,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       </div>
       
       {/* Project Metrics */}
-      <div className="px-5 pb-4">
-        <div className="flex items-center justify-between mb-1.5">
+      <div className="px-4 pb-3">
+        <div className="flex items-center justify-between mb-1">
           <span className="text-sm text-darkText">
             {project.inFundingRound 
               ? `Round: ${progressPercentage === 100 ? 'Closed' : 'Open'} ${progressPercentage < 100 ? `(${progressPercentage}% funded)` : ''}`
@@ -151,14 +151,14 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </span>
           )}
         </div>
-        <div className="progress-bar mb-4">
+        <div className="progress-bar mb-3">
           <div 
             className={`progress-fill ${progressColorClasses}`} 
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>
         
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-2">
           <div className="text-sm">
             <span className="text-darkText">Total Raised</span>
             <div className="font-medium text-white">{formatCurrency(project.totalFunding)}</div>
@@ -173,8 +173,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       </div>
       
       {/* Project Interactions */}
-      <div className="px-5 py-4 border-t border-darkBorder bg-darkCard bg-opacity-50 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="px-4 py-3 border-t border-darkBorder bg-darkCard bg-opacity-50 flex items-center justify-between">
+        <div className="flex items-center gap-2">
           <button className="flex items-center gap-1.5 text-darkText hover:text-white transition-colors">
             <FaComment className="h-3.5 w-3.5" />
             <span className="text-sm">{project.commentCount || 0}</span>
@@ -200,7 +200,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               project.inFundingRound && progressPercentage < 100
                 ? 'bg-primary hover:bg-opacity-90'
                 : 'bg-darkCard hover:bg-opacity-90'
-            } text-white rounded-lg px-3 py-1.5 text-sm font-medium transition-colors h-8`}
+            } text-white rounded-lg px-3 py-1.5 text-sm font-medium transition-colors h-7`}
             asChild
           >
             <a 

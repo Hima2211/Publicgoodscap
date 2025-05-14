@@ -46,10 +46,10 @@ export default function Home() {
           <p className="text-darkText mt-1">Discover and support the ecosystem's most impactful projects</p>
         </div>
         
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="w-full md:w-40 bg-darkCard border-darkBorder rounded-lg text-sm">
+              <SelectTrigger className="w-full md:w-32 bg-darkCard border-darkBorder rounded-lg h-8 text-xs">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
@@ -66,7 +66,7 @@ export default function Home() {
           
           <div className="relative">
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full md:w-48 bg-darkCard border-darkBorder rounded-lg text-sm">
+              <SelectTrigger className="w-full md:w-36 bg-darkCard border-darkBorder rounded-lg h-8 text-xs">
                 <SelectValue placeholder="Sort by: Trending" />
               </SelectTrigger>
               <SelectContent>

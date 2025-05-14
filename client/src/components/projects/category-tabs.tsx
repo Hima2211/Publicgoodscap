@@ -33,8 +33,8 @@ export default function CategoryTabs({ activeCategory, onCategoryChange }: Categ
   ];
   
   return (
-    <div className="mb-6 overflow-x-auto pb-2">
-      <div className="flex space-x-2 min-w-max">
+    <div className="mb-4 md:mb-6 overflow-x-auto pb-2">
+      <div className="flex space-x-1.5 md:space-x-2 min-w-max px-2 md:px-0">
         {categories.map(category => {
           const Icon = category.icon;
           const isActive = activeCategory === category.id;
@@ -43,15 +43,18 @@ export default function CategoryTabs({ activeCategory, onCategoryChange }: Categ
             <Button
               key={category.id}
               variant={isActive ? 'default' : 'outline'}
-              className={
-                isActive
+              size="sm"
+              className={`
+                h-8 md:h-10 text-xs md:text-sm px-2.5 md:px-4
+                ${isActive
                   ? 'bg-accent hover:bg-accent/90 text-darkBg'
                   : 'bg-darkCard hover:bg-darkCard/80 text-white hover:text-white'
-              }
+                }
+              `}
               onClick={() => onCategoryChange(category.id)}
             >
-              <Icon className={`mr-2 h-4 w-4 ${isActive ? 'text-darkBg' : 'text-accent'}`} />
-              {category.label}
+              <Icon className={`mr-1.5 md:mr-2 h-3.5 w-3.5 md:h-4 md:w-4 ${isActive ? 'text-darkBg' : 'text-accent'}`} />
+              <span className="whitespace-nowrap">{category.label}</span>
             </Button>
           );
         })}
