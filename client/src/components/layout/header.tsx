@@ -31,7 +31,12 @@ import {
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
-export default function Header() {
+interface HeaderProps {
+  onCategoryChange?: (category: string) => void;
+  onSearchQuery?: (query: string) => void;
+}
+
+export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps) {
   const [location] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -51,8 +56,16 @@ export default function Header() {
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Implement search functionality
-    console.log("Searching for:", searchQuery);
+    if (onSearchQuery) {
+      onSearchQuery(searchQuery);
+    }
+  };
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    if (onSearchQuery) {
+      onSearchQuery(e.target.value);
+    }
   };
   
   return (
@@ -101,36 +114,42 @@ export default function Header() {
             <Button 
               variant="default"
               className="bg-accent hover:bg-accent/90 text-darkBg text-[10px] font-medium px-2 py-1 h-6"
+              onClick={() => onCategoryChange?.('all')}
             >
               All
             </Button>
             <Button 
               variant="outline"
               className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
+              onClick={() => onCategoryChange?.('defi')}
             >
               DeFi
             </Button>
             <Button 
               variant="outline"
               className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
+              onClick={() => onCategoryChange?.('nft')}
             >
               NFT
             </Button>
             <Button 
               variant="outline"
               className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
+              onClick={() => onCategoryChange?.('dao')}
             >
               DAO
             </Button>
             <Button 
               variant="outline"
               className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
+              onClick={() => onCategoryChange?.('infrastructure')}
             >
               Infra
             </Button>
             <Button 
               variant="outline"
               className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
+              onClick={() => onCategoryChange?.('social')}
             >
               Social
             </Button>
@@ -163,7 +182,7 @@ export default function Header() {
                     placeholder="Search projects..."
                     className="w-full bg-darkBg border-darkBorder pl-10 pr-4 py-2"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={handleSearchChange}
                     autoFocus
                   />
                 </form>
@@ -260,7 +279,7 @@ export default function Header() {
                 placeholder="Search projects..."
                 className="w-64 bg-darkCard border-darkBorder pl-10 pr-4 py-2 text-sm"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
               />
             </form>
             
