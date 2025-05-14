@@ -1,4 +1,5 @@
 import { Project } from '@shared/schema';
+import { getProjectLogo } from './placeholder-images';
 
 // Sample data for mock display
 export const sampleProjects: Project[] = [
@@ -6,7 +7,7 @@ export const sampleProjects: Project[] = [
     id: 1,
     name: "MetaFinance",
     description: "Next-generation decentralized lending and borrowing protocol with innovative yield strategies.",
-    logo: "https://via.placeholder.com/60x60.png",
+    logo: getProjectLogo("defi"),
     category: "defi",
     totalFunding: 126450,
     fundingSources: ["Gitcoin", "Giveth"],
@@ -30,7 +31,7 @@ export const sampleProjects: Project[] = [
     id: 2,
     name: "PixelVerse",
     description: "Community-owned NFT marketplace with zero fees and creator-first royalty distribution.",
-    logo: "https://via.placeholder.com/60x60.png",
+    logo: getProjectLogo("nft"),
     category: "nft",
     totalFunding: 83200,
     fundingSources: ["Gitcoin", "Optimism"],
@@ -54,7 +55,7 @@ export const sampleProjects: Project[] = [
     id: 3,
     name: "GovernanceDAO",
     description: "Next-gen governance platform with quadratic voting and real-time treasury management.",
-    logo: "https://via.placeholder.com/60x60.png",
+    logo: getProjectLogo("dao"),
     category: "dao",
     totalFunding: 215750,
     fundingSources: ["Gitcoin", "Allo"],
@@ -78,7 +79,7 @@ export const sampleProjects: Project[] = [
     id: 4,
     name: "EtherLink",
     description: "Decentralized node infrastructure providing scalable RPC access for the entire ecosystem.",
-    logo: "https://via.placeholder.com/60x60.png",
+    logo: getProjectLogo("infrastructure"),
     category: "infrastructure",
     totalFunding: 37500,
     fundingSources: ["Gitcoin"],
@@ -102,7 +103,7 @@ export const sampleProjects: Project[] = [
     id: 5,
     name: "DecentraSocial",
     description: "Decentralized social network with user-owned data, privacy controls, and built-in monetization.",
-    logo: "https://via.placeholder.com/60x60.png",
+    logo: getProjectLogo("social"),
     category: "social",
     totalFunding: 178900,
     fundingSources: ["Gitcoin", "Giveth"],
@@ -126,7 +127,7 @@ export const sampleProjects: Project[] = [
     id: 6,
     name: "OpenLibrary",
     description: "Decentralized platform for open research, academic publishing, and knowledge sharing.",
-    logo: "https://via.placeholder.com/60x60.png",
+    logo: getProjectLogo("public_goods"),
     category: "public_goods",
     totalFunding: 98200,
     fundingSources: ["Gitcoin", "Allo"],
