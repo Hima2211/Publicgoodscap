@@ -42,7 +42,7 @@ export default function Home() {
     <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       {/* View Controls & Filters */}
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
+        <div className="hidden md:block">
           <h1 className="text-2xl md:text-3xl font-display font-bold text-white">Web3 Project Explorer</h1>
           <p className="text-darkText mt-1">Discover and support the ecosystem's most impactful projects</p>
         </div>
@@ -98,8 +98,10 @@ export default function Home() {
         </div>
       </div>
       
-      {/* Category Tabs */}
-      <CategoryTabs activeCategory={category} onCategoryChange={setCategory} />
+      {/* Category Tabs - Only visible on desktop */}
+      <div className="hidden md:block">
+        <CategoryTabs activeCategory={category} onCategoryChange={setCategory} />
+      </div>
       
       {/* Search Input (Mobile) */}
       <div className="md:hidden mb-6">

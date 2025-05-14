@@ -7,7 +7,19 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Menu, Search, Sun, Moon } from 'lucide-react';
+import { 
+  Menu, 
+  Search, 
+  Sun, 
+  Moon, 
+  Globe, 
+  DollarSign, 
+  Palette, 
+  Users, 
+  Database, 
+  HeartHandshake, 
+  MessagesSquare 
+} from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 export default function Header() {
@@ -78,6 +90,42 @@ export default function Header() {
           <Button variant="ghost" className="flex-1 rounded-none border-b-0 text-darkText py-3 px-2">
             Funding
           </Button>
+        </div>
+        
+        {/* Simple category navigation bar */}
+        <div className="md:hidden bg-darkBg">
+          <div className="overflow-x-auto flex space-x-2 p-2 min-w-max border-b border-darkBorder">
+            <Button 
+              variant="default"
+              className="bg-accent hover:bg-accent/90 text-darkBg text-xs font-medium px-3 py-1.5"
+            >
+              All Projects
+            </Button>
+            <Button 
+              variant="outline"
+              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-xs font-medium px-3 py-1.5"
+            >
+              DeFi
+            </Button>
+            <Button 
+              variant="outline"
+              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-xs font-medium px-3 py-1.5"
+            >
+              NFT
+            </Button>
+            <Button 
+              variant="outline"
+              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-xs font-medium px-3 py-1.5"
+            >
+              DAO
+            </Button>
+            <Button 
+              variant="outline"
+              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-xs font-medium px-3 py-1.5"
+            >
+              Infrastructure
+            </Button>
+          </div>
         </div>
         
         {/* Filters row */}
