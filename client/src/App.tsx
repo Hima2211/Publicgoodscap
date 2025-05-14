@@ -6,6 +6,8 @@ import Home from "@/pages/home";
 import { ThemeProvider } from "next-themes";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { useProjectsStore } from "@/store/projects-store";
+import { useEffect } from "react";
 
 function Router() {
   return (
@@ -17,11 +19,26 @@ function Router() {
 }
 
 function App() {
+  const { 
+    fetchProjects, 
+    setCategory, 
+    setSearchQuery, 
+    activeCategory 
+  } = useProjectsStore();
+
+  // Fetch projects on mount
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <TooltipProvider>
         <div className="flex flex-col min-h-screen bg-darkBg">
-          <Header />
+          <Header 
+            onCategoryChange={setCategory} 
+            onSearchQuery={setSearchQuery} 
+          />
           <div className="flex-grow">
             <Router />
           </div>

@@ -12,8 +12,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Search, Grid2x2Check, List } from "lucide-react";
+import { Grid2x2Check, List } from "lucide-react";
 
 export default function Home() {
   const [view, setView] = useState<"cards" | "table">("cards");
