@@ -88,9 +88,7 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
               <span className="ml-1 text-green-400">+0.18%</span>
             </div>
             <div className="flex items-center mt-0.5">
-              <span className="text-white font-medium">Volume</span>
-              <span className="ml-1 text-white">$61.3 B</span>
-              <span className="ml-1 text-red-400">-2.57%</span>
+              
             </div>
           </div>
           
@@ -108,53 +106,7 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
           </div>
         </div>
         
-        {/* Simple category navigation bar */}
-        <div className="md:hidden bg-darkBg">
-          <div className="overflow-x-auto flex space-x-1.5 p-1.5 min-w-max border-b border-darkBorder">
-            <Button 
-              variant="default"
-              className="bg-accent hover:bg-accent/90 text-darkBg text-[10px] font-medium px-2 py-1 h-6"
-              onClick={() => onCategoryChange?.('all')}
-            >
-              All
-            </Button>
-            <Button 
-              variant="outline"
-              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
-              onClick={() => onCategoryChange?.('defi')}
-            >
-              DeFi
-            </Button>
-            <Button 
-              variant="outline"
-              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
-              onClick={() => onCategoryChange?.('nft')}
-            >
-              NFT
-            </Button>
-            <Button 
-              variant="outline"
-              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
-              onClick={() => onCategoryChange?.('dao')}
-            >
-              DAO
-            </Button>
-            <Button 
-              variant="outline"
-              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
-              onClick={() => onCategoryChange?.('infrastructure')}
-            >
-              Infra
-            </Button>
-            <Button 
-              variant="outline"
-              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
-              onClick={() => onCategoryChange?.('social')}
-            >
-              Social
-            </Button>
-          </div>
-        </div>
+        
         
         {/* Sort and View Controls */}
         <div className="flex items-center justify-between border-b border-darkBorder px-3 py-2">
@@ -287,7 +239,7 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full bg-darkCard border border-darkBorder"
+              className="rounded-full bg-secondary border border-border"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               aria-label="Toggle theme"
             >
