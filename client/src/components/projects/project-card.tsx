@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Project } from "@shared/schema";
 import { formatCurrency } from "@/lib/utils";
-import { FaTwitter, FaDiscord, FaGithub, FaTelegram, FaGlobe, FaComment, FaRetweet, FaStar } from "react-icons/fa";
+import { FaTwitter, FaDiscord, FaGithub, FaTelegram, FaGlobe, FaComment, FaRetweet } from "react-icons/fa";
+import { BiUpvote } from "react-icons/bi";
 import { FaFireFlameSimple } from "react-icons/fa6";
 import { BiTrendingUp } from "react-icons/bi";
 import { TbCheck } from "react-icons/tb";
@@ -175,18 +176,20 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       {/* Project Interactions */}
       <div className="px-4 py-3 border-t border-darkBorder bg-darkCard bg-opacity-50 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 text-darkText hover:text-white transition-colors">
+          <button 
+            className="flex items-center gap-1.5 text-darkText hover:text-white transition-colors"
+            onClick={() => {/* Add comment action */}}
+          >
             <FaComment className="h-3.5 w-3.5" />
             <span className="text-sm">{project.commentCount || 0}</span>
           </button>
-          <button className="flex items-center gap-1.5 text-darkText hover:text-white transition-colors">
-            <FaRetweet className="h-3.5 w-3.5" />
-            <span className="text-sm">{project.shareCount || 0}</span>
+          <button 
+            className="flex items-center gap-1.5 text-darkText hover:text-white transition-colors group"
+            onClick={() => {/* Add upvote action */}}
+          >
+            <BiUpvote className="h-3.5 w-3.5 group-hover:-translate-y-0.5 transition-transform" />
+            <span className="text-sm">{project.upvoteCount || 0}</span>
           </button>
-          <div className="flex items-center gap-1 text-darkText">
-            <span className="text-xs">🌟</span>
-            <span className="text-sm">+{project.pointsCount || 0}</span>
-          </div>
         </div>
         
         <div className="flex items-center gap-2">
