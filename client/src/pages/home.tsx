@@ -103,20 +103,6 @@ export default function Home() {
         <CategoryTabs activeCategory={category} onCategoryChange={setCategory} />
       </div>
       
-      {/* Search Input (Mobile) */}
-      <div className="md:hidden mb-6">
-        <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-darkText" />
-          <Input
-            type="text"
-            placeholder="Search projects..."
-            className="w-full bg-darkCard border-darkBorder pl-10 text-sm"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
-      
       {/* Loading State */}
       {isLoading && (
         <div className="flex justify-center items-center h-64">

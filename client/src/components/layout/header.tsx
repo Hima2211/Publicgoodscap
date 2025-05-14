@@ -7,6 +7,13 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { 
   Menu, 
   Search, 
@@ -18,7 +25,9 @@ import {
   Users, 
   Database, 
   HeartHandshake, 
-  MessagesSquare 
+  MessagesSquare,
+  Grid2x2Check,
+  List
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
@@ -50,27 +59,37 @@ export default function Header() {
     <header className="bg-darkBg border-b border-darkBorder sticky top-0 z-50">
       {/* Mobile header (CoinMarketCap style) */}
       <div className="md:hidden">
-        {/* Market stats bar */}
-        <div className="flex items-center justify-between py-2 px-4 bg-darkBg border-b border-darkBorder text-xs">
-          <div className="flex items-center">
-            <span className="text-white font-medium">Market Cap</span>
-            <span className="ml-2 text-white">$2.08 T</span>
-            <span className="ml-1 text-green-400">+0.18%</span>
+        {/* Market stats bar with logo */}
+        <div className="flex items-center justify-between py-2 px-3 bg-darkBg border-b border-darkBorder text-xs">
+          <Link href="/" className="flex items-center">
+            <svg className="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 14.5V11a9 9 0 0 0-18 0v3.5A4.5 4.5 0 0 0 6 22h12a4.5 4.5 0 0 0 3-7.5zM6 12h12v2H6v-2zm12 8H6a2.5 2.5 0 0 1 0-5h12a2.5 2.5 0 0 1 0 5z"/>
+            </svg>
+            <span className="ml-1 text-sm font-bold text-white">BuidlMark</span>
+          </Link>
+          
+          <div className="flex flex-col items-end">
+            <div className="flex items-center">
+              <span className="text-white font-medium">Market Cap</span>
+              <span className="ml-1 text-white">$2.08 T</span>
+              <span className="ml-1 text-green-400">+0.18%</span>
+            </div>
+            <div className="flex items-center mt-0.5">
+              <span className="text-white font-medium">Volume</span>
+              <span className="ml-1 text-white">$61.3 B</span>
+              <span className="ml-1 text-red-400">-2.57%</span>
+            </div>
           </div>
-          <div className="flex items-center">
-            <span className="text-white font-medium">Volume</span>
-            <span className="ml-2 text-white">$61.3 B</span>
-            <span className="ml-1 text-red-400">-2.57%</span>
-          </div>
+          
           <div className="flex items-center">
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-8 w-8 rounded-full"
+              className="h-6 w-6 rounded-full"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
               {mounted && (
-                theme === 'dark' ? <Sun className="h-4 w-4 text-accent" /> : <Moon className="h-4 w-4 text-accent" />
+                theme === 'dark' ? <Sun className="h-3 w-3 text-accent" /> : <Moon className="h-3 w-3 text-accent" />
               )}
             </Button>
           </div>
@@ -78,76 +97,66 @@ export default function Header() {
         
         {/* Simple category navigation bar */}
         <div className="md:hidden bg-darkBg">
-          <div className="overflow-x-auto flex space-x-2 p-2 min-w-max border-b border-darkBorder">
+          <div className="overflow-x-auto flex space-x-1.5 p-1.5 min-w-max border-b border-darkBorder">
             <Button 
               variant="default"
-              className="bg-accent hover:bg-accent/90 text-darkBg text-xs font-medium px-3 py-1.5"
+              className="bg-accent hover:bg-accent/90 text-darkBg text-[10px] font-medium px-2 py-1 h-6"
             >
-              All Projects
+              All
             </Button>
             <Button 
               variant="outline"
-              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-xs font-medium px-3 py-1.5"
+              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
             >
               DeFi
             </Button>
             <Button 
               variant="outline"
-              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-xs font-medium px-3 py-1.5"
+              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
             >
               NFT
             </Button>
             <Button 
               variant="outline"
-              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-xs font-medium px-3 py-1.5"
+              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
             >
               DAO
             </Button>
             <Button 
               variant="outline"
-              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-xs font-medium px-3 py-1.5"
+              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
             >
-              Infrastructure
+              Infra
+            </Button>
+            <Button 
+              variant="outline"
+              className="bg-darkCard hover:bg-darkCard/80 text-white hover:text-white text-[10px] font-medium px-2 py-1 h-6"
+            >
+              Social
             </Button>
           </div>
         </div>
         
-        {/* Menu Button */}
-        <div className="flex items-center justify-end border-b border-darkBorder px-4 py-2">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-white">
-                <Menu className="h-4 w-4" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="bg-darkCard border-darkBorder">
-              <div className="flex flex-col h-full py-6">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center">
-                    <svg className="w-8 h-8 text-accent" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M21 14.5V11a9 9 0 0 0-18 0v3.5A4.5 4.5 0 0 0 6 22h12a4.5 4.5 0 0 0 3-7.5zM6 12h12v2H6v-2zm12 8H6a2.5 2.5 0 0 1 0-5h12a2.5 2.5 0 0 1 0 5z"/>
-                    </svg>
-                    <span className="ml-2 text-lg font-bold text-white">BuidlMarketCap</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-2 mb-6">
-                  {navItems.map((item) => (
-                    <Link 
-                      key={item.href} 
-                      href={item.href}
-                      className={`block px-3 py-2 rounded-lg text-base font-medium transition-colors ${
-                        location === item.href 
-                          ? 'bg-primary bg-opacity-10 text-primary' 
-                          : 'text-darkText hover:bg-darkBg hover:text-white'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-                
-                <form onSubmit={handleSearch} className="relative mb-6">
+        {/* Sort and View Controls */}
+        <div className="flex items-center justify-between border-b border-darkBorder px-3 py-2">
+          <div className="flex space-x-2 items-center">
+            <button className="h-6 w-24 text-[10px] bg-darkCard border border-darkBorder rounded px-2 py-1 flex items-center justify-between">
+              <span className="text-white">Trending</span>
+              <svg className="h-3 w-3 text-darkText" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+          
+          <div className="flex items-center space-x-1">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6 text-darkText">
+                  <Search className="h-3.5 w-3.5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="top" className="bg-darkCard border-darkBorder pt-16 pb-4 px-4">
+                <form onSubmit={handleSearch} className="relative">
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-darkText" />
                   <Input
                     type="text"
@@ -155,17 +164,63 @@ export default function Header() {
                     className="w-full bg-darkBg border-darkBorder pl-10 pr-4 py-2"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    autoFocus
                   />
                 </form>
-                
-                <div className="mt-auto">
-                  <Button className="w-full bg-accent hover:bg-opacity-90 text-darkBg font-medium">
-                    Connect Wallet
-                  </Button>
+              </SheetContent>
+            </Sheet>
+            
+            <div className="flex bg-darkCard rounded overflow-hidden border border-darkBorder">
+              <button className="px-2 py-1 flex items-center text-[10px] bg-darkCard text-accent">
+                <Grid2x2Check className="h-3 w-3" />
+              </button>
+              <button className="px-2 py-1 flex items-center text-[10px] bg-darkBg text-darkText">
+                <List className="h-3 w-3" />
+              </button>
+            </div>
+            
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6 text-white">
+                  <Menu className="h-3.5 w-3.5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="bg-darkCard border-darkBorder">
+                <div className="flex flex-col h-full py-6">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center">
+                      <svg className="w-8 h-8 text-accent" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21 14.5V11a9 9 0 0 0-18 0v3.5A4.5 4.5 0 0 0 6 22h12a4.5 4.5 0 0 0 3-7.5zM6 12h12v2H6v-2zm12 8H6a2.5 2.5 0 0 1 0-5h12a2.5 2.5 0 0 1 0 5z"/>
+                      </svg>
+                      <span className="ml-2 text-lg font-bold text-white">BuidlMarketCap</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2 mb-6">
+                    {navItems.map((item) => (
+                      <Link 
+                        key={item.href} 
+                        href={item.href}
+                        className={`block px-3 py-2 rounded-lg text-base font-medium transition-colors ${
+                          location === item.href 
+                            ? 'bg-primary bg-opacity-10 text-primary' 
+                            : 'text-darkText hover:bg-darkBg hover:text-white'
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-auto">
+                    <Button className="w-full bg-accent hover:bg-opacity-90 text-darkBg font-medium">
+                      Connect Wallet
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
       
