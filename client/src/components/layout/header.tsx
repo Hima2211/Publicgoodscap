@@ -12,19 +12,12 @@ import {
 import { Search, Sun, Moon, Grid2x2Check, List } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { WalletConnectConnector } from '@wagmi/core';
+import { walletConnect } from '@wagmi/connectors';
 
 interface HeaderProps {
   onCategoryChange?: (category: string) => void;
   onSearchQuery?: (query: string) => void;
 }
-
-const walletConnect = new WalletConnectConnector({
-  projectId: "37b5e2fccd46c838885f41186745251e",
-  options: {
-    projectId: "37b5e2fccd46c838885f41186745251e"
-  }
-});
 
 export default function Header({
   onCategoryChange,
