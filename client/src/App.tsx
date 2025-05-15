@@ -1,3 +1,4 @@
+
 import { Switch, Route } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,22 +14,22 @@ import { useEffect } from "react";
 import AdminDashboard from "@/pages/admin/dashboard";
 
 // Wagmi imports
-import { createConfig } from 'wagmi';
-import { WalletConnectConnector } from '@wagmi/core/connectors/walletConnect';
+import { createConfig, WagmiConfig, http } from 'wagmi';
 import { mainnet, sepolia } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
+import { walletConnect } from '@wagmi/connectors';
 
 const config = createConfig({
   chains: [mainnet, sepolia],
   connectors: [
-    new WalletConnectConnector({
+    walletConnect({
       projectId: '37b5e2fccd46c838885f41186745251e',
-      chains: [mainnet, sepolia]
     }),
   ],
-  publicClient: publicProvider(),
+  transports: {
+    [mainnet.id]: http(),
+    [sepolia.id]: http(),
+  },
 });
-
 
 function Router() {
   return (
