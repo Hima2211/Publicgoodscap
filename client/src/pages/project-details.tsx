@@ -26,10 +26,39 @@ export default function ProjectDetails() {
   const { id } = useParams();
   const projectId = parseInt(id || "");
 
-  const { data: project, isLoading } = useQuery<Project>({
-    queryKey: ["/api/projects", projectId],
+  const { data: project, isLoading, error } = useQuery<Project>({
+    queryKey: ["api/projects", projectId],
+    queryFn: async () => {
+      const response = await fetch(`/api/projects/${projectId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch project details');
+      }
+      return response.json();
+    },
     enabled: !isNaN(projectId),
   });
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-4rem)]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !project) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] gap-4">
+        <h2 className="text-2xl font-bold text-white">Project not found</h2>
+        <p className="text-darkText">The project you're looking for doesn't exist or has been removed.</p>
+        <Link href="/">
+          <Button variant="outline">← Back to Projects</Button>
+        </Link>
+      </div>
+    );
+  }
 
   // Format category display name
   const getCategoryName = (category?: string) => {
@@ -39,18 +68,18 @@ export default function ProjectDetails() {
   };
 
   // Determine progress percentage and colors
-  const progressPercentage = project?.fundingProgress || 0;
+  const progressPercentage = project.fundingProgress || 0;
   let progressColorClasses = 'bg-primary';
 
   if (progressPercentage === 100) {
     progressColorClasses = 'bg-success';
-  } else if (project?.category === 'defi') {
+  } else if (project.category === 'defi') {
     progressColorClasses = 'bg-gradient-to-r from-primary to-secondary';
-  } else if (project?.category === 'nft') {
+  } else if (project.category === 'nft') {
     progressColorClasses = 'bg-gradient-to-r from-accent to-secondary';
-  } else if (project?.category === 'public_goods') {
+  } else if (project.category === 'public_goods') {
     progressColorClasses = 'bg-gradient-to-r from-success to-primary';
-  } else if (project?.category === 'social') {
+  } else if (project.category === 'social') {
     progressColorClasses = 'bg-gradient-to-r from-accent to-primary';
   }
 
@@ -59,30 +88,22 @@ export default function ProjectDetails() {
   let statusText = '';
   let statusColor = '';
 
-  if (project?.isHot) {
+  if (project.isHot) {
     StatusIcon = FaFireFlameSimple;
     statusText = 'Hot Project';
     statusColor = 'text-success';
-  } else if (project?.isTrending) {
+  } else if (project.isTrending) {
     StatusIcon = BiTrendingUp;
     statusText = 'Trending';
     statusColor = 'text-warning';
-  } else if (project?.inFundingRound && progressPercentage === 100) {
+  } else if (project.inFundingRound && progressPercentage === 100) {
     StatusIcon = TbCheck;
     statusText = 'Funded';
     statusColor = 'text-darkText';
-  } else if (!project?.inFundingRound) {
+  } else if (!project.inFundingRound) {
     StatusIcon = LuClock;
     statusText = 'New';
     statusColor = 'text-darkText';
-  }
-
-  if (isLoading || !project) {
-    return (
-      <div className="flex justify-center items-center h-[calc(100vh-4rem)]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
   }
 
   return (
@@ -97,7 +118,7 @@ export default function ProjectDetails() {
       {/* Project Header */}
       <div className="flex flex-col md:flex-row gap-6 mb-8">
         <img
-          src={project.logo}
+          src={project.logo || '/placeholder-logo.png'}
           alt={`${project.name} logo`}
           className="w-24 h-24 rounded-xl flex-shrink-0 object-cover"
         />
@@ -188,7 +209,7 @@ export default function ProjectDetails() {
           
           <div className="mb-4">
             <span className="text-sm text-darkText">Total Raised</span>
-            <div className="text-2xl font-bold text-white">{formatCurrency(project.totalFunding)}</div>
+            <div className="text-2xl font-bold text-white">{formatCurrency(project.totalFunding || 0)}</div>
           </div>
 
           {project.inFundingRound && (
@@ -243,19 +264,19 @@ export default function ProjectDetails() {
             <div>
               <span className="text-sm text-darkText">Points Earned</span>
               <div className="font-medium text-white mt-1">
-                {project.pointsCount}
+                {project.pointsCount || 0}
               </div>
             </div>
             <div>
               <span className="text-sm text-darkText">Comments</span>
               <div className="font-medium text-white mt-1">
-                {project.commentCount}
+                {project.commentCount || 0}
               </div>
             </div>
             <div>
               <span className="text-sm text-darkText">Shares</span>
               <div className="font-medium text-white mt-1">
-                {project.shareCount}
+                {project.shareCount || 0}
               </div>
             </div>
           </div>
@@ -268,15 +289,15 @@ export default function ProjectDetails() {
           <div className="flex flex-col gap-3">
             <Button variant="outline" className="w-full justify-start gap-2">
               <FaComment className="h-4 w-4" />
-              <span>Comment ({project.commentCount})</span>
+              <span>Comment ({project.commentCount || 0})</span>
             </Button>
             <Button variant="outline" className="w-full justify-start gap-2">
               <BiUpvote className="h-4 w-4" />
-              <span>Vote ({project.pointsCount})</span>
+              <span>Vote ({project.pointsCount || 0})</span>
             </Button>
             <Button variant="outline" className="w-full justify-start gap-2">
               <FaRetweet className="h-4 w-4" />
-              <span>Share ({project.shareCount})</span>
+              <span>Share ({project.shareCount || 0})</span>
             </Button>
           </div>
         </div>
