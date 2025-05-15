@@ -12,6 +12,21 @@ import { useProjectsStore } from "@/store/projects-store";
 import { useEffect } from "react";
 import AdminDashboard from "@/pages/admin/dashboard";
 
+// Wagmi imports
+import { WagmiConfig, createConfig, mainnet } from 'wagmi'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+
+const config = createConfig({
+  connectors: [
+    new WalletConnectConnector({
+      options: {
+        projectId: '37b5e2fccd46c838885f41186745251e'
+      },
+    }),
+  ],
+})
+
+
 function Router() {
   return (
     <Switch>
@@ -38,21 +53,23 @@ function App() {
   }, [fetchProjects]);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <TooltipProvider>
-        <div className="flex flex-col min-h-screen bg-darkBg">
-          <Header 
-            onCategoryChange={setCategory} 
-            onSearchQuery={setSearchQuery} 
-          />
-          <div className="flex-grow">
-            <Router />
+    <WagmiConfig config={config}>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <TooltipProvider>
+          <div className="flex flex-col min-h-screen bg-darkBg">
+            <Header 
+              onCategoryChange={setCategory} 
+              onSearchQuery={setSearchQuery} 
+            />
+            <div className="flex-grow">
+              <Router />
+            </div>
+            <Footer />
           </div>
-          <Footer />
-        </div>
-        <Toaster />
-      </TooltipProvider>
-    </ThemeProvider>
+          <Toaster />
+        </TooltipProvider>
+      </ThemeProvider>
+    </WagmiConfig>
   );
 }
 
