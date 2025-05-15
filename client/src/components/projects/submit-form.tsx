@@ -1,25 +1,32 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CategoryEnum } from "@shared/schema";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-  name: z.string().min(2).max(100),
-  description: z.string().min(10).max(500),
-  category: z.enum(["defi", "nft", "dao", "infrastructure", "public_goods", "social"]),
-  website: z.string().url().optional().nullable(),
-  github: z.string().url().optional().nullable(),
-  twitter: z.string().url().optional().nullable(),
-  discord: z.string().url().optional().nullable(),
-  telegram: z.string().url().optional().nullable(),
-  logo: z.string().url(),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  category: z.enum(["public_goods", "defi", "nft", "dao", "infrastructure", "social"]),
+  website: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  github: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  twitter: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  discord: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  telegram: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  logo: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -46,8 +53,18 @@ export default function SubmitForm() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      // TODO: Implement API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated API call
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to submit project");
+      }
+      
       setIsSuccess(true);
     } catch (error) {
       console.error("Error submitting project:", error);
@@ -78,12 +95,12 @@ export default function SubmitForm() {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Project Description</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea 
-                  placeholder="Describe your project in detail" 
-                  className="h-32 resize-none"
-                  {...field} 
+                  placeholder="Describe your project"
+                  className="h-32"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -104,11 +121,11 @@ export default function SubmitForm() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
+                  <SelectItem value="public_goods">Public Goods</SelectItem>
                   <SelectItem value="defi">DeFi</SelectItem>
                   <SelectItem value="nft">NFT</SelectItem>
                   <SelectItem value="dao">DAO</SelectItem>
                   <SelectItem value="infrastructure">Infrastructure</SelectItem>
-                  <SelectItem value="public_goods">Public Goods</SelectItem>
                   <SelectItem value="social">Social</SelectItem>
                 </SelectContent>
               </Select>
@@ -124,7 +141,7 @@ export default function SubmitForm() {
             <FormItem>
               <FormLabel>Logo URL</FormLabel>
               <FormControl>
-                <Input placeholder="Enter the URL of your project logo" {...field} />
+                <Input placeholder="https://example.com/logo.png" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -137,7 +154,7 @@ export default function SubmitForm() {
             name="website"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Website URL</FormLabel>
+                <FormLabel>Website</FormLabel>
                 <FormControl>
                   <Input placeholder="https://your-project.com" {...field} />
                 </FormControl>
@@ -151,7 +168,7 @@ export default function SubmitForm() {
             name="github"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>GitHub URL</FormLabel>
+                <FormLabel>GitHub</FormLabel>
                 <FormControl>
                   <Input placeholder="https://github.com/your-project" {...field} />
                 </FormControl>
@@ -165,7 +182,7 @@ export default function SubmitForm() {
             name="twitter"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Twitter URL</FormLabel>
+                <FormLabel>Twitter</FormLabel>
                 <FormControl>
                   <Input placeholder="https://twitter.com/your-project" {...field} />
                 </FormControl>
@@ -179,7 +196,7 @@ export default function SubmitForm() {
             name="discord"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Discord URL</FormLabel>
+                <FormLabel>Discord</FormLabel>
                 <FormControl>
                   <Input placeholder="https://discord.gg/your-project" {...field} />
                 </FormControl>
@@ -193,7 +210,7 @@ export default function SubmitForm() {
             name="telegram"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Telegram URL</FormLabel>
+                <FormLabel>Telegram</FormLabel>
                 <FormControl>
                   <Input placeholder="https://t.me/your-project" {...field} />
                 </FormControl>

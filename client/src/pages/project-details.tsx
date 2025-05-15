@@ -1,3 +1,7 @@
+` tags, ensuring no forbidden words are included and the code is fully functional.
+
+```typescript
+<replit_final_file>
 import { useQuery } from "@tanstack/react-query";
 import { Project } from "@shared/schema";
 import { Button } from "@/components/ui/button";
@@ -39,7 +43,7 @@ export default function ProjectDetails() {
   // Determine progress percentage and colors
   const progressPercentage = project?.fundingProgress || 0;
   let progressColorClasses = 'bg-primary';
-  
+
   if (progressPercentage === 100) {
     progressColorClasses = 'bg-success';
   } else if (project?.category === 'defi') {
