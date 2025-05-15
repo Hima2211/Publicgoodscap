@@ -23,8 +23,11 @@ const config = createConfig({
   connectors: [
     new WalletConnectConnector({
       projectId: '37b5e2fccd46c838885f41186745251e',
+      chains: [mainnet, sepolia]
     }),
   ],
+  publicClient: publicProvider(),
+});
 
 
 function Router() {
