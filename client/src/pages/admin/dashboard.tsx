@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LineChart } from "@/components/admin/line-chart";
 import ProjectsTable from "@/components/admin/projects-table";
 import StatsCards from "@/components/admin/stats-cards";
+import ImportMonitor from "@/components/admin/import-monitor";
 
 export default function AdminDashboard() {
   const { data: projects, isLoading } = useQuery({
@@ -38,6 +39,7 @@ export default function AdminDashboard() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="projects">Projects</TabsTrigger>
           <TabsTrigger value="funding">Funding</TabsTrigger>
+          <TabsTrigger value="imports">Imports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-8">
@@ -64,6 +66,10 @@ export default function AdminDashboard() {
               <LineChart data={[]} />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="imports">
+          <ImportMonitor />
         </TabsContent>
       </Tabs>
     </div>
