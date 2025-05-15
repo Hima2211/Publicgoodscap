@@ -12,7 +12,7 @@ import {
 import { Search, Sun, Moon, Grid2x2Check, List } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { WalletConnectConnector } from "wagmi/connectors";
+import { WalletConnect } from "wagmi/connectors";
 
 interface HeaderProps {
   onCategoryChange?: (category: string) => void;
@@ -20,8 +20,8 @@ interface HeaderProps {
 }
 
 const walletConnect = (projectId: string) =>
-  new WalletConnectConnector({
-    options: { projectId: projectId },
+  new WalletConnect({
+    projectId,
   });
 
 export default function Header({
@@ -141,11 +141,7 @@ export default function Header({
                 className="h-6 text-xs bg-accent hover:bg-accent/90 text-darkBg font-medium"
                 onClick={() =>
                   useConnect().connect({
-                    connector: walletConnect({
-                      options: {
-                        projectId: "37b5e2fccd46c838885f41186745251e",
-                      },
-                    }),
+                    connector: walletConnect("37b5e2fccd46c838885f41186745251e"),
                   })
                 }
               >
