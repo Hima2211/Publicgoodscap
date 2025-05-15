@@ -1,6 +1,7 @@
 import { Project } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import { useLocation } from "wouter";
 import { FaTwitter, FaDiscord, FaGithub, FaTelegram, FaGlobe } from "react-icons/fa";
 
 interface ProjectTableProps {
@@ -8,6 +9,8 @@ interface ProjectTableProps {
 }
 
 export default function ProjectTable({ projects }: ProjectTableProps) {
+  const [, setLocation] = useLocation();
+
   // Format category display name
   const getCategoryName = (category: string) => {
     if (category === 'public_goods') return 'Public Goods';
@@ -22,6 +25,10 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
     'infrastructure': '',
     'public_goods': '',
     'social': ''
+  };
+
+  const handleRowClick = (projectId: number) => {
+    setLocation(`/projects/${projectId}`);
   };
   
   return (
@@ -78,7 +85,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
               
               if (project.twitter) {
                 socialIcons.push(
-                  <a key="twitter" href={project.twitter} className="social-icon text-darkText hover:text-primary" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+                  <a key="twitter" href={project.twitter} className="social-icon text-darkText hover:text-primary" aria-label="Twitter" target="_blank" rel="noopener noreferrer" onClick={handleLinkClick}>
                     <FaTwitter />
                   </a>
                 );
@@ -86,7 +93,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
               
               if (project.discord) {
                 socialIcons.push(
-                  <a key="discord" href={project.discord} className="social-icon text-darkText hover:text-primary" aria-label="Discord" target="_blank" rel="noopener noreferrer">
+                  <a key="discord" href={project.discord} className="social-icon text-darkText hover:text-primary" aria-label="Discord" target="_blank" rel="noopener noreferrer" onClick={handleLinkClick}>
                     <FaDiscord />
                   </a>
                 );
@@ -94,7 +101,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
               
               if (project.telegram) {
                 socialIcons.push(
-                  <a key="telegram" href={project.telegram} className="social-icon text-darkText hover:text-primary" aria-label="Telegram" target="_blank" rel="noopener noreferrer">
+                  <a key="telegram" href={project.telegram} className="social-icon text-darkText hover:text-primary" aria-label="Telegram" target="_blank" rel="noopener noreferrer" onClick={handleLinkClick}>
                     <FaTelegram />
                   </a>
                 );
@@ -102,7 +109,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
               
               if (project.github) {
                 socialIcons.push(
-                  <a key="github" href={project.github} className="social-icon text-darkText hover:text-primary" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
+                  <a key="github" href={project.github} className="social-icon text-darkText hover:text-primary" aria-label="GitHub" target="_blank" rel="noopener noreferrer" onClick={handleLinkClick}>
                     <FaGithub />
                   </a>
                 );
@@ -110,14 +117,14 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
               
               if (project.website) {
                 socialIcons.push(
-                  <a key="website" href={project.website} className="social-icon text-darkText hover:text-primary" aria-label="Website" target="_blank" rel="noopener noreferrer">
+                  <a key="website" href={project.website} className="social-icon text-darkText hover:text-primary" aria-label="Website" target="_blank" rel="noopener noreferrer" onClick={handleLinkClick}>
                     <FaGlobe />
                   </a>
                 );
               }
               
               return (
-                <tr key={project.id} className="border-b border-darkBorder hover:bg-darkCard transition-colors">
+                <tr key={project.id} className="border-b border-darkBorder hover:bg-darkCard transition-colors cursor-pointer" onClick={() => handleRowClick(project.id)}>
                   <td className="px-4 py-4 text-sm">{index + 1}</td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
@@ -181,6 +188,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                         href={project.fundingRoundLink || '#'} 
                         target="_blank" 
                         rel="noopener noreferrer"
+                        onClick={handleLinkClick}
                       >
                         {project.inFundingRound && progressPercentage < 100 ? 'Fund' : 'Donate'}
                       </a>

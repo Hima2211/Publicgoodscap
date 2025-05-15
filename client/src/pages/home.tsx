@@ -42,8 +42,8 @@ export default function Home() {
       {/* View Controls & Filters */}
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="hidden md:block">
-          <h1 className="text-2xl md:text-3xl font-display font-bold text-white">Web3 Project Explorer</h1>
-          <p className="text-darkText mt-1">Discover and support the ecosystem's most impactful projects</p>
+          <h1 className="text-2xl md:text-3xl font-display font-bold text-white">Public Goods Market Cap.</h1>
+          <p className="text-darkText mt-1">Discover, track and support the ecosystem's most impactful Public goods.</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-2">

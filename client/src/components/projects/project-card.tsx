@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Project } from "@shared/schema";
 import { formatCurrency } from "@/lib/utils";
+import { Link } from "wouter";
 import { FaTwitter, FaDiscord, FaGithub, FaTelegram, FaGlobe, FaComment, FaRetweet } from "react-icons/fa";
 import { BiUpvote } from "react-icons/bi";
 import { FaFireFlameSimple } from "react-icons/fa6";
@@ -13,6 +14,11 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
+  const handleInteractionClick = (e: React.MouseEvent) => {
+    // Prevent project card click when clicking on interactive elements
+    e.stopPropagation();
+  };
+
   // Determine progress percentage
   const progressPercentage = project.fundingProgress || 0;
   
@@ -73,131 +79,135 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   
   // Social media icons
   const socialIcons = [];
-  
-  if (project.twitter) {
+   if (project.twitter) {
     socialIcons.push(
-      <a key="twitter" href={project.twitter} className="social-icon text-darkText hover:text-primary" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
-        <FaTwitter />
+      <a key="twitter" href={project.twitter} className="social-icon text-darkText hover:text-primary" aria-label="Twitter" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
+        <FaTwitter className="h-4 w-4" />
       </a>
     );
   }
-  
+
   if (project.discord) {
     socialIcons.push(
-      <a key="discord" href={project.discord} className="social-icon text-darkText hover:text-primary" aria-label="Discord" target="_blank" rel="noopener noreferrer">
-        <FaDiscord />
+      <a key="discord" href={project.discord} className="social-icon text-darkText hover:text-primary" aria-label="Discord" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
+        <FaDiscord className="h-4 w-4" />
       </a>
     );
   }
-  
-  if (project.telegram) {
+   if (project.telegram) {
     socialIcons.push(
-      <a key="telegram" href={project.telegram} className="social-icon text-darkText hover:text-primary" aria-label="Telegram" target="_blank" rel="noopener noreferrer">
-        <FaTelegram />
+      <a key="telegram" href={project.telegram} className="social-icon text-darkText hover:text-primary" aria-label="Telegram" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
+        <FaTelegram className="h-4 w-4" />
       </a>
     );
   }
-  
+
   if (project.github) {
     socialIcons.push(
-      <a key="github" href={project.github} className="social-icon text-darkText hover:text-primary" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
-        <FaGithub />
+      <a key="github" href={project.github} className="social-icon text-darkText hover:text-primary" aria-label="GitHub" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
+        <FaGithub className="h-4 w-4" />
       </a>
     );
   }
-  
+
   if (project.website) {
     socialIcons.push(
-      <a key="website" href={project.website} className="social-icon text-darkText hover:text-primary" aria-label="Website" target="_blank" rel="noopener noreferrer">
-        <FaGlobe />
+      <a key="website" href={project.website} className="social-icon text-darkText hover:text-primary" aria-label="Website" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
+        <FaGlobe className="h-4 w-4" />
       </a>
     );
   }
   
   return (
-    <div className="project-card bg-darkCard rounded-xl overflow-hidden border border-darkBorder shadow-card">
-      {/* Project Header */}
-      <div className="p-4 flex items-start gap-3">
-        <img 
-          src={project.logo} 
-          alt={`${project.name} logo`} 
-          className="w-10 h-10 rounded-lg flex-shrink-0 object-cover" 
-        />
-        
-        <div className="overflow-hidden">
-          <div className="flex items-center gap-2">
-            <h3 className="font-bold text-base text-white truncate">{project.name}</h3>
-            <span className={`badge ${categoryClass} text-xs`}>{getCategoryName(project.category)}</span>
-          </div>
-          <p className="text-darkText text-sm line-clamp-2">
-            {project.description}
-          </p>
-        </div>
-      </div>
-      
-      {/* Project Metrics */}
-      <div className="px-4 pb-3">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-sm text-darkText">
-            {project.inFundingRound 
-              ? `Round: ${progressPercentage === 100 ? 'Closed' : 'Open'} ${progressPercentage < 100 ? `(${progressPercentage}% funded)` : ''}`
-              : 'Round: Closed'
-            }
-          </span>
+    <Link href={`/projects/${project.id}`}>
+      <div className="project-card bg-darkCard rounded-xl overflow-hidden border border-darkBorder shadow-card cursor-pointer hover:border-primary">
+        {/* Project Header */}
+        <div className="p-4 flex items-start gap-3">
+          <img 
+            src={project.logo} 
+            alt={`${project.name} logo`} 
+            className="w-10 h-10 rounded-lg flex-shrink-0 object-cover" 
+          />
           
-          {StatusIcon && (
-            <span className={`text-sm font-medium ${statusColor} flex items-center gap-1`}>
-              <StatusIcon className="h-3.5 w-3.5" />
-              <span>{statusText}</span>
-            </span>
-          )}
-        </div>
-        <div className="progress-bar mb-3">
-          <div 
-            className={`progress-fill ${progressColorClasses}`} 
-            style={{ width: `${progressPercentage}%` }}
-          ></div>
+          <div className="overflow-hidden">
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-base text-white truncate">{project.name}</h3>
+              <span className={`badge ${categoryClass} text-xs`}>{getCategoryName(project.category)}</span>
+            </div>
+            <p className="text-darkText text-sm line-clamp-2">
+              {project.description}
+            </p>
+          </div>
         </div>
         
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm">
-            <span className="text-darkText">Total Raised</span>
-            <div className="font-medium text-white">{formatCurrency(project.totalFunding)}</div>
+        {/* Project Metrics */}
+        <div className="px-4 pb-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-sm text-darkText">
+              {project.inFundingRound 
+                ? `Round: ${progressPercentage === 100 ? 'Closed' : 'Open'} ${progressPercentage < 100 ? `(${progressPercentage}% funded)` : ''}`
+                : 'Round: Closed'
+              }
+            </span>
+            
+            {StatusIcon && (
+              <span className={`text-sm font-medium ${statusColor} flex items-center gap-1`}>
+                <StatusIcon className="h-3.5 w-3.5" />
+                <span>{statusText}</span>
+              </span>
+            )}
           </div>
-          <div className="text-sm">
-            <span className="text-darkText">Funding Sources</span>
-            <div className="font-medium text-white">
-              {project.fundingSources?.length ? project.fundingSources.join(', ') : 'None'}
+          <div className="progress-bar mb-3">
+            <div 
+              className={`progress-fill ${progressColorClasses}`} 
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
+          </div>
+          
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm">
+              <span className="text-darkText">Total Raised</span>
+              <div className="font-medium text-white">{formatCurrency(project.totalFunding)}</div>
+            </div>
+            <div className="text-sm">
+              <span className="text-darkText">Funding Sources</span>
+              <div className="font-medium text-white">
+                {project.fundingSources?.length ? project.fundingSources.join(', ') : 'None'}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      {/* Project Interactions */}
-      <div className="px-4 py-3 border-t border-darkBorder bg-darkCard bg-opacity-50 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <button 
-            className="flex items-center gap-1.5 text-darkText hover:text-white transition-colors"
-            onClick={() => {/* Add comment action */}}
-          >
-            <FaComment className="h-3.5 w-3.5" />
-            <span className="text-sm">{project.commentCount || 0}</span>
-          </button>
-          <button 
-            className="flex items-center gap-1.5 text-darkText hover:text-white transition-colors group"
-            onClick={() => {/* Add upvote action */}}
-          >
-            <BiUpvote className="h-3.5 w-3.5 group-hover:-translate-y-0.5 transition-transform" />
-            <span className="text-sm">{project.upvoteCount || 0}</span>
-          </button>
-        </div>
         
-        <div className="flex items-center gap-2">
-          <div className="flex space-x-1.5">
-            {socialIcons}
+        {/* Project Interactions */}
+        <div className="px-4 py-3 border-t border-darkBorder bg-darkCard bg-opacity-50 flex items-center justify-between" onClick={handleInteractionClick}>
+          <div className="flex items-center gap-2">
+            <button 
+              className="flex items-center gap-1.5 text-darkText hover:text-white transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                /* Add comment action */
+              }}
+            >
+              <FaComment className="h-3.5 w-3.5" />
+              <span className="text-sm">{project.commentCount || 0}</span>
+            </button>
+            <button 
+              className="flex items-center gap-1.5 text-darkText hover:text-white transition-colors group"
+              onClick={(e) => {
+                e.preventDefault();
+                /* Add upvote action */
+              }}
+            >
+              <BiUpvote className="h-3.5 w-3.5 group-hover:-translate-y-0.5 transition-transform" />
+              <span className="text-sm">{project.pointsCount}</span>
+            </button>
           </div>
           
-          <Button 
+          <div className="flex items-center gap-2">
+            <div className="flex space-x-1.5">
+              {socialIcons}
+            </div>
+               <Button 
             size="sm"
             className={`fund-button ${
               project.inFundingRound && progressPercentage < 100
@@ -205,17 +215,20 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 : 'bg-darkCard hover:bg-opacity-90'
             } text-white rounded-lg px-3 py-1.5 text-sm font-medium transition-colors h-7`}
             asChild
+            onClick={handleInteractionClick}
           >
             <a 
               href={project.fundingRoundLink || '#'} 
               target="_blank" 
               rel="noopener noreferrer"
+              onClick={handleInteractionClick}
             >
-              {project.inFundingRound && progressPercentage < 100 ? 'Fund' : 'Donate'}
-            </a>
-          </Button>
+            {project.inFundingRound && progressPercentage < 100 ? 'Fund' : 'Donate'}
+              </a>
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

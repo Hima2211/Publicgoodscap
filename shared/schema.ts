@@ -50,6 +50,50 @@ export const insertProjectSchema = createInsertSchema(projects).omit({
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type Project = typeof projects.$inferSelect;
 
+// Comment Schema
+export const comments = pgTable("comments", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => projects.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  content: text("content").notNull(),
+  parentId: integer("parent_id").notNull().default(0),  // 0 means no parent
+  upvotes: integer("upvotes").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertCommentSchema = createInsertSchema(comments).omit({
+  id: true,
+  upvotes: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertComment = z.infer<typeof insertCommentSchema>;
+export type Comment = typeof comments.$inferSelect;
+
+// Activity Schema
+export const ActivityTypeEnum = z.enum(['comment', 'upvote', 'project_update', 'funding_update']);
+export type ActivityType = z.infer<typeof ActivityTypeEnum>;
+
+export const activities = pgTable("activities", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => projects.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  type: text("type").notNull(),
+  content: text("content").notNull(),
+  metadata: json("metadata").notNull().$default(() => ({})),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertActivitySchema = createInsertSchema(activities).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertActivity = z.infer<typeof insertActivitySchema>;
+export type Activity = typeof activities.$inferSelect;
+
 // Funding Status Enum
 export const FundingStatusEnum = z.enum(['open', 'closed']);
 export type FundingStatus = z.infer<typeof FundingStatusEnum>;

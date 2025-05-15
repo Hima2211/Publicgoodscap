@@ -134,7 +134,7 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
   <rect x="104.214" y="51.9163" width="7.93217" height="8.12102" fill="white"/>
   <path d="M80.5 287V276.75H90.75V287H80.5ZM80.5 297.25H70.25V287H80.5V297.25ZM70.25 297.25V307.5H60V297.25H70.25ZM70.25 317.75V307.5H80.5V317.75H70.25ZM80.5 317.75H90.75V328H80.5V317.75ZM111.25 297.25V276.75H121.5V297.25H111.25ZM111.25 328H101V297.25H111.25V328ZM131.75 287V276.75H142V287H131.75ZM142 297.25V287H152.25V297.25H142ZM152.25 297.25H162.5V307.5H152.25V297.25ZM152.25 317.75H142V307.5H152.25V317.75ZM142 317.75V328H131.75V317.75H142Z" fill="#070707"/>
 </svg>
-                <span className="ml-2 text-xl font-bold text-white">BuidlMarketCap</span>
+                <span className="ml-2 text-xl font-bold text-white">youBuidl</span>
               </Link>
               
               <nav className="flex space-x-4">
@@ -165,12 +165,14 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-darkText w-4 h-4" />
               </form>
               
-              <Button
-                variant="outline"
-                className="border-border hover:bg-darkCard"
-              >
-                Submit Project
-              </Button>
+              <Link href="/submit">
+                <Button
+                  variant="outline"
+                  className="border-border hover:bg-darkCard"
+                >
+                  Submit Project
+                </Button>
+              </Link>
               
               <Button 
                 variant="ghost" 
