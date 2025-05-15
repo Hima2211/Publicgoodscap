@@ -149,7 +149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/comments/:id/upvote", async (req, res) => {
+  app.post("/api/comments/:id/like", async (req, res) => {
     try {
       const commentId = parseInt(req.params.id);
       const comment = await storage.upvoteComment(commentId);
