@@ -53,6 +53,10 @@ export default function Header({
     }
   };
 
+  const { connect, isConnecting, connector, isDisconnected, } = useConnect();
+  const { isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+
   return (
     <header className="bg-darkBg border-b border-darkBorder sticky top-0 z-50">
       {/* Mobile header */}
@@ -120,29 +124,25 @@ export default function Header({
           </Link>
 
           <div className="flex items-center space-x-2">
-            {useAccount().isConnected ? (
-              <Button
-                variant="default"
-                size="sm"
-                className="h-6 text-xs bg-accent hover:bg-accent/90 text-darkBg font-medium"
-                onClick={() => useDisconnect().disconnect()}
-              >
-                Disconnect
-              </Button>
-            ) : (
-              <Button
-                variant="default"
-                size="sm"
-                className="h-6 text-xs bg-accent hover:bg-accent/90 text-darkBg font-medium"
-                onClick={() =>
-                  useConnect().connect({
-                    connector: walletConnect
-                  })
-                }
-              >
-                Connect Wallet
-              </Button>
-            )}
+            {isConnected ? (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="h-6 text-xs bg-accent hover:bg-accent/90 text-darkBg font-medium"
+                  onClick={() => disconnect()}
+                >
+                  Disconnect
+                </Button>
+              ) : (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="h-6 text-xs bg-accent hover:bg-accent/90 text-darkBg font-medium"
+                  onClick={() => connect({ connector: walletConnect })}
+                >
+                  Connect Wallet
+                </Button>
+              )}
 
             <Button
               variant="ghost"
@@ -286,12 +286,12 @@ export default function Header({
                 </Button>
               </Link>
 
-              {useAccount().isConnected ? (
+              {isConnected ? (
                 <Button
                   variant="ghost"
                   size="icon"
                   className="rounded-full"
-                  onClick={() => useDisconnect().disconnect()}
+                  onClick={() => disconnect()}
                 >
                   Disconnect
                 </Button>
@@ -301,7 +301,7 @@ export default function Header({
                   size="icon"
                   className="rounded-full"
                   onClick={() =>
-                    useConnect().connect({
+                    connect({
                       connector: walletConnect({
                         options: {
                           projectId: "37b5e2fccd46c838885f41186745251e",
