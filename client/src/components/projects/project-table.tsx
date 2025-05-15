@@ -11,6 +11,10 @@ interface ProjectTableProps {
 export default function ProjectTable({ projects }: ProjectTableProps) {
   const [, setLocation] = useLocation();
 
+  const handleLinkClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row click when clicking links
+  };
+
   // Format category display name
   const getCategoryName = (category: string) => {
     if (category === 'public_goods') return 'Public Goods';
