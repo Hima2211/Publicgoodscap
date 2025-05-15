@@ -17,6 +17,7 @@ import {
   List
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useAccount, useConnect, useDisconnect, WalletConnectConnector } from 'wagmi';
 
 interface HeaderProps {
   onCategoryChange?: (category: string) => void;
@@ -28,32 +29,32 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
   const [searchQuery, setSearchQuery] = useState('');
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  
+
   // Only access theme client-side to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
-  
+
   const navItems = [
     { label: 'Discover', href: '/' },
     { label: 'Categories', href: '/categories' },
     { label: 'Learn', href: '/learn' }
   ];
-  
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (onSearchQuery) {
       onSearchQuery(searchQuery);
     }
   };
-  
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     if (onSearchQuery) {
       onSearchQuery(e.target.value);
     }
   };
-  
+
   return (
     <header className="bg-darkBg border-b border-darkBorder sticky top-0 z-50">
       {/* Mobile header */}
@@ -74,16 +75,30 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
 </svg>
             <span className="ml-1 text-sm font-bold text-white">youBuidl</span>
           </Link>
-          
+
           <div className="flex items-center space-x-2">
-            <Button
-              variant="default"
-              size="sm"
-              className="h-6 text-xs bg-accent hover:bg-accent/90 text-darkBg font-medium"
-            >
-              Connect
-            </Button>
-            
+            {useAccount().isConnected ? (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="h-6 text-xs bg-accent hover:bg-accent/90 text-darkBg font-medium"
+                  onClick={() => useDisconnect().disconnect()}
+                >
+                  Disconnect
+                </Button>
+              ) : (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="h-6 text-xs bg-accent hover:bg-accent/90 text-darkBg font-medium"
+                  onClick={() => useConnect().connect({ connector: new WalletConnectConnector({
+                    options: { projectId: '37b5e2fccd46c838885f41186745251e' }
+                  })})}
+                >
+                  Connect Wallet
+                </Button>
+              )}
+
             <Button 
               variant="ghost" 
               size="icon" 
@@ -104,7 +119,7 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
             <span className="ml-2 text-white text-sm">$2.08 T</span>
             <span className="ml-1 text-green-400 text-sm">+0.18%</span>
           </div>
-          
+
           <div className="flex rounded overflow-hidden border border-darkBorder h-5">
             <button className="px-1.5 flex items-center text-[10px] bg-darkCard text-accent">
               <Grid2x2Check className="h-2.5 w-2.5" />
@@ -115,7 +130,7 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
           </div>
         </div>
       </div>
-      
+
       {/* Desktop header */}
       <div className="hidden md:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -136,7 +151,7 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
 </svg>
                 <span className="ml-2 text-xl font-bold text-white">youBuidl</span>
               </Link>
-              
+
               <nav className="flex space-x-4">
                 {navItems.map(item => (
                   <Link 
@@ -151,7 +166,7 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
                 ))}
               </nav>
             </div>
-            
+
             {/* Search and Right Section */}
             <div className="flex items-center space-x-4">
               <form onSubmit={handleSearch} className="relative">
@@ -164,7 +179,7 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
                 />
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-darkText w-4 h-4" />
               </form>
-              
+
               <Link href="/submit">
                 <Button
                   variant="outline"
@@ -173,6 +188,28 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
                   Submit Project
                 </Button>
               </Link>
+
+              {useAccount().isConnected ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  onClick={() => useDisconnect().disconnect()}
+                >
+                  Disconnect
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  onClick={() => useConnect().connect({ connector: new WalletConnectConnector({
+                    options: { projectId: '37b5e2fccd46c838885f41186745251e' }
+                  })})}
+                >
+                 Connect
+                </Button>
+              )}
               
               <Button 
                 variant="ghost" 
