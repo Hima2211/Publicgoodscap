@@ -13,15 +13,13 @@ import { useEffect } from "react";
 import AdminDashboard from "@/pages/admin/dashboard";
 
 // Wagmi imports
-import { WagmiConfig, createConfig, mainnet } from 'wagmi'
-import { walletConnect } from '@wagmi/connectors'
+import { WagmiConfig, createConfig } from 'wagmi'
+import { WalletConnectConnector } from '@wagmi/core/connectors/walletConnect'
 
 const config = createConfig({
   connectors: [
     new WalletConnectConnector({
-      options: {
-        projectId: '37b5e2fccd46c838885f41186745251e'
-      },
+      projectId: '37b5e2fccd46c838885f41186745251e'
     }),
   ],
 })
