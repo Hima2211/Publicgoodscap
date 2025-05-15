@@ -12,7 +12,7 @@ import {
 import { Search, Sun, Moon, Grid2x2Check, List } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { WalletConnectConnector } from "@wagmi/connectors/walletConnect";
+import { WalletConnectConnector } from '@wagmi/core';
 
 interface HeaderProps {
   onCategoryChange?: (category: string) => void;
