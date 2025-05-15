@@ -17,12 +17,18 @@ import {
   List
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { useAccount, useConnect, useDisconnect, WalletConnectConnector } from 'wagmi';
+import { useAccount, useConnect, useDisconnect,  } from 'wagmi';
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 
 interface HeaderProps {
   onCategoryChange?: (category: string) => void;
   onSearchQuery?: (query: string) => void;
 }
+
+const walletConnect = ({ projectId }: { projectId: string }) =>
+  new WalletConnectConnector({
+    options: { projectId },
+  })
 
 export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps) {
   const [location] = useLocation();
@@ -91,7 +97,7 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
                   variant="default"
                   size="sm"
                   className="h-6 text-xs bg-accent hover:bg-accent/90 text-darkBg font-medium"
-                  onClick={() => useConnect().connect({ connector: new WalletConnectConnector({
+                  onClick={() => useConnect().connect({ connector: walletConnect({
                     options: { projectId: '37b5e2fccd46c838885f41186745251e' }
                   })})}
                 >
@@ -203,14 +209,14 @@ export default function Header({ onCategoryChange, onSearchQuery }: HeaderProps)
                   variant="ghost"
                   size="icon"
                   className="rounded-full"
-                  onClick={() => useConnect().connect({ connector: new WalletConnectConnector({
+                  onClick={() => useConnect().connect({ connector: walletConnect({
                     options: { projectId: '37b5e2fccd46c838885f41186745251e' }
                   })})}
                 >
                  Connect
                 </Button>
               )}
-              
+
               <Button 
                 variant="ghost" 
                 size="icon"

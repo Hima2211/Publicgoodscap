@@ -14,7 +14,7 @@ import AdminDashboard from "@/pages/admin/dashboard";
 
 // Wagmi imports
 import { WagmiConfig, createConfig, mainnet } from 'wagmi'
-import { WalletConnectConnector } from '@wagmi/connectors'
+import { walletConnect } from '@wagmi/connectors'
 
 const config = createConfig({
   connectors: [
