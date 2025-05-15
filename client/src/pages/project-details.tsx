@@ -32,7 +32,8 @@ export default function ProjectDetails() {
   });
 
   // Format category display name
-  const getCategoryName = (category: string) => {
+  const getCategoryName = (category?: string) => {
+    if (!category) return '';
     if (category === 'public_goods') return 'Public Goods';
     return category.charAt(0).toUpperCase() + category.slice(1);
   };
