@@ -10,6 +10,7 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { useProjectsStore } from "@/store/projects-store";
 import { useEffect } from "react";
+import AdminDashboard from "@/pages/admin/dashboard";
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/projects/:id" component={ProjectDetails} />
       <Route path="/submit" component={Submit} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
   );
