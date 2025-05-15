@@ -26,7 +26,10 @@ const formSchema = z.object({
   twitter: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   discord: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   telegram: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  logo: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  logo: z.string().url("Must be a valid URL").min(1, "Logo URL is required"),
+  totalFunding: z.number().min(0, "Funding amount must be positive").optional(),
+  inFundingRound: z.boolean().default(false),
+  fundingRoundLink: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -139,7 +142,7 @@ export default function SubmitForm() {
           name="logo"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Logo URL</FormLabel>
+              <FormLabel>Logo URL<span className="text-red-500">*</span></FormLabel>
               <FormControl>
                 <Input placeholder="https://example.com/logo.png" {...field} />
               </FormControl>
@@ -147,6 +150,59 @@ export default function SubmitForm() {
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="totalFunding"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Total Funding Amount (USD)</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  placeholder="0"
+                  onChange={e => field.onChange(e.target.value ? Number(e.target.value) : '')}
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="inFundingRound"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+              <FormControl>
+                <input
+                  type="checkbox"
+                  checked={field.value}
+                  onChange={field.onChange}
+                  className="h-4 w-4"
+                />
+              </FormControl>
+              <FormLabel className="font-normal">Currently in funding round</FormLabel>
+            </FormItem>
+          )}
+        />
+
+        {form.watch("inFundingRound") && (
+          <FormField
+            control={form.control}
+            name="fundingRoundLink"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Funding Round Link</FormLabel>
+                <FormControl>
+                  <Input placeholder="https://funding-platform.com/your-project" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
