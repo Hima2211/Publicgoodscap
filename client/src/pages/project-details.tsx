@@ -1,7 +1,4 @@
-` tags, ensuring no forbidden words are included and the code is fully functional.
 
-```typescript
-<replit_final_file>
 import { useQuery } from "@tanstack/react-query";
 import { Project } from "@shared/schema";
 import { Button } from "@/components/ui/button";
