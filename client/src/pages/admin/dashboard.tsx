@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,8 +5,12 @@ import { LineChart } from "@/components/admin/line-chart";
 import ProjectsTable from "@/components/admin/projects-table";
 import StatsCards from "@/components/admin/stats-cards";
 import ImportMonitor from "@/components/admin/import-monitor";
+import { AdminHeader } from "@/components/admin/admin-header";
+import SubmitForm from "@/components/projects/submit-form";
+import { useAdminGuard } from "@/hooks/use-admin-guard";
 
 export default function AdminDashboard() {
+  const isAdmin = useAdminGuard();
   const { data: projects, isLoading } = useQuery({
     queryKey: ["api/projects"],
     queryFn: async () => {
@@ -17,8 +20,15 @@ export default function AdminDashboard() {
     },
   });
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (!isAdmin || isLoading) {
+    return (
+      <div className="min-h-screen bg-darkBg">
+        <AdminHeader />
+        <div className="flex items-center justify-center h-[calc(100vh-64px)]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+        </div>
+      </div>
+    );
   }
 
   const stats = {
@@ -29,49 +39,55 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
-      
-      <StatsCards stats={stats} />
+    <div className="min-h-screen bg-darkBg">
+      <AdminHeader />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="space-y-8">
+          {/* Compact Stats Section */}
+          <div className="grid gap-4">
+            <StatsCards stats={stats} />
+          </div>
 
-      <Tabs defaultValue="overview" className="mt-8">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="projects">Projects</TabsTrigger>
-          <TabsTrigger value="funding">Funding</TabsTrigger>
-          <TabsTrigger value="imports">Imports</TabsTrigger>
-        </TabsList>
+          {/* Main Content Tabs */}
+          <Card className="bg-darkCard border-darkBorder">
+            <CardContent className="p-6">
+              <Tabs defaultValue="overview">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="projects">Projects</TabsTrigger>
+                  <TabsTrigger value="submit">Add Project</TabsTrigger>
+                  <TabsTrigger value="import">Import</TabsTrigger>
+                </TabsList>
 
-        <TabsContent value="overview" className="space-y-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Growth</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <LineChart data={[]} />
+                <TabsContent value="overview" className="mt-4">
+                  <div className="space-y-4">
+                    <div>
+                      <h2 className="text-lg font-semibold text-white mb-4">Project Growth</h2>
+                      <LineChart data={[]} />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="projects" className="mt-4">
+                  <div className="space-y-4">
+                    <ProjectsTable projects={projects || []} />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="submit" className="mt-4">
+                  <div className="max-w-3xl mx-auto">
+                    <SubmitForm isAdmin={true} />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="import" className="mt-4">
+                  <ImportMonitor />
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="projects">
-          <ProjectsTable projects={projects} />
-        </TabsContent>
-
-        <TabsContent value="funding">
-          <Card>
-            <CardHeader>
-              <CardTitle>Funding Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <LineChart data={[]} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="imports">
-          <ImportMonitor />
-        </TabsContent>
-      </Tabs>
+        </div>
+      </main>
     </div>
   );
 }

@@ -21,11 +21,6 @@ export default function Submit() {
   return (
     <div className="min-h-screen">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-display font-bold text-white">Submit Project</h1>
-          <p className="text-darkText mt-1">Add your project to the Public Goods Market Cap platform.</p>
-        </div>
-
         <Card className="bg-darkCard border-darkBorder">
           <CardHeader>
             <CardTitle>Submit Your Project</CardTitle>

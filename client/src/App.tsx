@@ -1,17 +1,21 @@
-
-import { Switch, Route } from "wouter";
+import { Switch, Route, Router, useLocation } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import ProjectDetails from "@/pages/project-details";
 import Submit from "@/pages/submit";
+import Profile from "@/pages/profile";
+import Leaderboard from "@/pages/leaderboard";
 import { ThemeProvider } from "next-themes";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { useProjectsStore } from "@/store/projects-store";
 import { useEffect } from "react";
 import AdminDashboard from "@/pages/admin/dashboard";
+import AdminLogin from "@/pages/admin/login";
+import { AuthProvider } from "@/lib/auth";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 
 // Wagmi imports
 import { createConfig, WagmiConfig, http } from 'wagmi';
@@ -31,49 +35,52 @@ const config = createConfig({
   },
 });
 
-function Router() {
-  return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/projects/:id" component={ProjectDetails} />
-      <Route path="/submit" component={Submit} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route component={NotFound} />
-    </Switch>
-  );
-}
-
 function App() {
-  const { 
-    fetchProjects, 
-    setCategory, 
-    setSearchQuery, 
-    activeCategory 
-  } = useProjectsStore();
-
-  // Fetch projects on mount
+  const { fetchProjects, setCategory, setSearchQuery, activeCategory } = useProjectsStore();
+  const [location] = useLocation();
+  
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
 
+  const isAdminRoute = location.startsWith('/admin');
+  
   return (
-    <WagmiConfig config={config}>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-        <TooltipProvider>
-          <div className="flex flex-col min-h-screen bg-darkBg">
-            <Header 
-              onCategoryChange={setCategory} 
-              onSearchQuery={setSearchQuery} 
-            />
-            <div className="flex-grow">
-              <Router />
-            </div>
-            <Footer />
-          </div>
-          <Toaster />
-        </TooltipProvider>
-      </ThemeProvider>
-    </WagmiConfig>
+    <Router>
+      <WagmiConfig config={config}>
+        <AuthProvider>
+          <ThemeProvider defaultTheme="dark">
+            <TooltipProvider>
+              <div className="flex min-h-screen flex-col">
+                {/* Only show main header on non-admin routes */}
+                {!isAdminRoute && <Header onCategoryChange={setCategory} onSearchQuery={setSearchQuery} />}
+                <div className="flex-1">
+                  <Switch>
+                    <Route path="/" component={Home} />
+                    <Route path="/project/:id" component={ProjectDetails} />
+                    <Route path="/submit" component={Submit} />
+                    <Route path="/profile" component={Profile} />
+                    <Route path="/leaderboard" component={Leaderboard} />
+                    <Route path="/admin/login" component={AdminLogin} />
+                    <Route path="/admin">
+                      {() => (
+                        <ProtectedRoute>
+                          <AdminDashboard />
+                        </ProtectedRoute>
+                      )}
+                    </Route>
+                    <Route component={NotFound} />
+                  </Switch>
+                </div>
+                {/* Only show footer on non-admin routes */}
+                {!isAdminRoute && <Footer />}
+              </div>
+              <Toaster />
+            </TooltipProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </WagmiConfig>
+    </Router>
   );
 }
 
