@@ -39,6 +39,7 @@ export const projects = pgTable("projects", {
   commentCount: integer("comment_count").notNull().default(0),
   shareCount: integer("share_count").notNull().default(0),
   pointsCount: integer("points_count").notNull().default(0),
+  hasUpvoted: boolean("has_upvoted").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

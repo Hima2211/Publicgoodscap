@@ -90,10 +90,15 @@ export default {
             height: "0",
           },
         },
+        "bounce-short": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-3px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "bounce-short": "bounce-short 0.5s ease-in-out",
       },
     },
   },

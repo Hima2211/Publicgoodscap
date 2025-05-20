@@ -1,11 +1,9 @@
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { FaReply, FaHeart } from 'react-icons/fa';
+import { FaReply, FaHeart, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { useAccount } from 'wagmi';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface User {
   address: string;
@@ -30,6 +28,7 @@ interface DiscussionProps {
 export default function Discussion({ projectId }: DiscussionProps) {
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [expandedComments, setExpandedComments] = useState<Set<number>>(new Set());
   const { address } = useAccount();
   const queryClient = useQueryClient();
 
@@ -86,94 +85,138 @@ export default function Discussion({ projectId }: DiscussionProps) {
     likeMutation.mutate(commentId);
   };
 
-  const renderComment = (comment: Comment, isReply = false) => (
-    <div key={comment.id} className={`flex gap-3 ${!isReply ? 'mb-6' : 'mt-4'}`}>
-      <img
-        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.user.address}`}
-        alt="avatar"
-        className="w-10 h-10 rounded-full"
-      />
-      <div className="flex-1">
-        <div className="p-4 rounded-lg bg-darkCard border border-darkBorder">
-          <div className="flex items-start justify-between mb-2">
-            <div>
-              <span className="font-medium text-white">
-                {comment.user.address.slice(0, 6)}...{comment.user.address.slice(-4)}
-              </span>
-              <span className="mx-1.5 text-darkText">•</span>
-              <span className="text-xs text-darkText">
-                {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-              </span>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`flex items-center gap-1 ${comment.hasLiked ? 'text-red-500' : 'text-darkText'}`}
-              onClick={() => handleLike(comment.id)}
-            >
-              <FaHeart className="h-3 w-3" />
-              <span className="text-xs">{comment.likes}</span>
-            </Button>
-          </div>
-          <p className="text-sm text-white mb-3">{comment.content}</p>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs text-darkText hover:text-white"
-            onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-          >
-            <FaReply className="h-3 w-3 mr-1" />
-            Reply
-          </Button>
-        </div>
+  const toggleComment = (commentId: number) => {
+    setExpandedComments(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(commentId)) {
+        newSet.delete(commentId);
+      } else {
+        newSet.add(commentId);
+      }
+      return newSet;
+    });
+  };
 
-        {replyingTo === comment.id && (
-          <div className="mt-3">
-            <div className="flex gap-2">
-              <img
-                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${address}`}
-                alt="Your avatar"
-                className="w-8 h-8 rounded-full"
-              />
-              <div className="flex-1">
-                <Textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Write your reply..."
-                  className="bg-darkBg border-darkBorder mb-2"
-                />
-                <div className="flex justify-end gap-2">
+  const renderComment = (comment: Comment, isReply = false) => {
+    const isExpanded = expandedComments.has(comment.id);
+    const hasReplies = comment.replies?.length > 0;
+
+    return (
+      <div key={comment.id} className={`flex gap-3 ${!isReply ? 'mb-6' : 'mt-4'}`}>
+        <img
+          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.user.address}`}
+          alt="avatar"
+          className="w-10 h-10 rounded-full"
+        />
+        <div className="flex-1">
+          <div 
+            className="p-4 rounded-lg bg-darkCard border border-darkBorder cursor-pointer hover:bg-darkCard/80 transition-colors"
+            onClick={() => hasReplies && toggleComment(comment.id)}
+          >
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center">
+                <span className="font-medium text-white">
+                  {comment.user.address.slice(0, 6)}...{comment.user.address.slice(-4)}
+                </span>
+                <span className="mx-1.5 text-darkText">•</span>
+                <span className="text-xs text-darkText">
+                  {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                </span>
+                {hasReplies && (
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => {
-                      setReplyingTo(null);
-                      setNewComment('');
+                    className="ml-2 p-0 h-auto hover:bg-transparent"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleComment(comment.id);
                     }}
                   >
-                    Cancel
+                    {isExpanded ? (
+                      <FaChevronUp className="h-3 w-3 text-darkText" />
+                    ) : (
+                      <FaChevronDown className="h-3 w-3 text-darkText" />
+                    )}
                   </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => handleSubmit(comment.id)}
-                    disabled={!newComment.trim() || !address}
-                  >
-                    Reply
-                  </Button>
+                )}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`flex items-center gap-1 ${comment.hasLiked ? 'text-red-500' : 'text-darkText'}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLike(comment.id);
+                }}
+              >
+                <FaHeart className="h-3 w-3" />
+                <span className="text-xs">{comment.likes}</span>
+              </Button>
+            </div>
+            <p className="text-sm text-white mb-3">{comment.content}</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-darkText hover:text-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                setReplyingTo(replyingTo === comment.id ? null : comment.id);
+              }}
+            >
+              <FaReply className="h-3 w-3 mr-1" />
+              Reply {hasReplies && !isExpanded && `(${comment.replies.length})`}
+            </Button>
+          </div>
+
+          {replyingTo === comment.id && (
+            <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+              <div className="flex gap-2">
+                <img
+                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${address}`}
+                  alt="Your avatar"
+                  className="w-8 h-8 rounded-full"
+                />
+                <div className="flex-1">
+                  <Textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Write your reply..."
+                    className="bg-darkBg border-darkBorder mb-2"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setReplyingTo(null);
+                        setNewComment('');
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => handleSubmit(comment.id)}
+                      disabled={!newComment.trim() || !address}
+                    >
+                      Reply
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {comment.replies?.length > 0 && (
-          <div className="pl-4 border-l border-darkBorder mt-4">
-            {comment.replies.map((reply) => renderComment(reply, true))}
-          </div>
-        )}
+          {hasReplies && isExpanded && (
+            <div className="pl-4 border-l border-darkBorder mt-4">
+              {comment.replies.map((reply) => renderComment(reply, true))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (isLoading) {
     return (

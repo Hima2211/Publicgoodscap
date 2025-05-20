@@ -24,6 +24,9 @@ import Discussion from "@/components/projects/discussion";
 
 export default function ProjectDetails() {
   const { id } = useParams();
+  const [location] = useLocation();
+  const searchParams = new URLSearchParams(location.split('?')[1]);
+  const defaultTab = searchParams.get('tab') || 'activity';
   const projectId = parseInt(id || "");
 
   const { data: project, isLoading, error } = useQuery<Project>({
@@ -287,7 +290,16 @@ export default function ProjectDetails() {
           <h3 className="text-lg font-medium text-white mb-4">Get Involved</h3>
           
           <div className="flex flex-col gap-3">
-            <Button variant="outline" className="w-full justify-start gap-2">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start gap-2"
+              onClick={() => {
+                const newUrl = `/projects/${projectId}?tab=discussion`;
+                window.history.pushState(null, '', newUrl);
+                const newSearchParams = new URLSearchParams(location.split('?')[1]);
+                newSearchParams.set('tab', 'discussion');
+              }}
+            >
               <FaComment className="h-4 w-4" />
               <span>Comment ({project.commentCount || 0})</span>
             </Button>
@@ -305,7 +317,7 @@ export default function ProjectDetails() {
 
       {/* Project Activity & Discussion */}
       <div className="bg-darkCard rounded-xl border border-darkBorder overflow-hidden">
-        <Tabs defaultValue="activity">
+        <Tabs defaultValue={defaultTab}>
           <TabsList className="flex p-0 bg-darkBg border-b border-darkBorder">
             <TabsTrigger 
               value="activity" 
