@@ -4,7 +4,7 @@ import { Project } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatCurrency } from "@/lib/utils";
-import { useParams, Link } from "wouter";
+import { useParams, useLocation, Link } from "wouter";
 import {
   FaTwitter,
   FaDiscord,

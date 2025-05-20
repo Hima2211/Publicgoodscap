@@ -58,7 +58,11 @@ export const comments = pgTable("comments", {
   userId: integer("user_id").notNull().references(() => users.id),
   content: text("content").notNull(),
   parentId: integer("parent_id").notNull().default(0),  // 0 means no parent
+  threadId: integer("thread_id").notNull().default(0),  // For grouping replies in a thread
+  depth: integer("depth").notNull().default(0),         // Nesting level in thread
+  replyCount: integer("reply_count").notNull().default(0),
   upvotes: integer("upvotes").notNull().default(0),
+  mentions: text("mentions").array(),                   // Store @username mentions
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
