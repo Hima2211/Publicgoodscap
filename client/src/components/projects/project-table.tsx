@@ -32,7 +32,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
   };
 
   const handleRowClick = (projectId: number) => {
-    setLocation(`/projects/${projectId}`);
+    setLocation(`/project/${projectId}`);
   };
   
   return (

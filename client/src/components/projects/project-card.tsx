@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAccount } from "wagmi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface Comment {
   id: number;
@@ -88,6 +88,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       if (!address) {
         throw new Error('Please connect your wallet to upvote');
       }
+      const response = await fetch(`/api/projects/${project.id}/upvote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: address })
+      });
+      if (!response.ok) {
         const error = await response.json();
         if (error.code === 'ALREADY_UPVOTED') {
           throw new Error('You have already upvoted this project');
@@ -96,48 +102,43 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       }
       return response.json();
     },
+    onMutate: () => {
+      setIsUpvoting(true);
+    },
     onSuccess: () => {
-      // Invalidate project data to refresh points count
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      // Trigger animation
+      // Optimistically update the UI
       setUpvoteAnimation(true);
       setTimeout(() => setUpvoteAnimation(false), 500);
-    }
-  });
+      
+      // Show success toast
+      toast({
+        description: "Project upvoted successfully!",
+        duration: 2000,
+      });
 
-  const handleLike = (e: React.MouseEvent, commentId: number) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!address) return;
-    likeMutation.mutate(commentId);
-  };
-
-  const handleUpvote = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!address) return;
-    if (project.hasUpvoted) {
-      // Optional: Show a toast message that user already upvoted
-      return;
+      // Invalidate project data to refresh points count
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+    onError: (error: Error) => {
+      // Show error toast
+      toast({
+        variant: "destructive",
+        description: error.message,
+        duration: 3000,
+      });
+    },
+    onSettled: () => {
+      setIsUpvoting(false);
     }
-    try {
-      await upvoteMutation.mutateAsync();
-    } catch (error) {
-      // Handle error (e.g., show toast message)
-      console.error('Failed to upvote:', error);
-    }
-  };
-
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Only handle click if it's not in the comments section or interaction area
-    const target = e.target as HTMLElement;
-    const commentsSection = target.closest(`#comments-section-${project.id}`);
-    const interactionSection = target.closest('.interaction-section');
-    
-    if (!commentsSection && !interactionSection) {
-      setLocation(`/projects/${project.id}`);
-    }
-  };
+  });    const handleCardClick = (e: React.MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const commentsSection = target.closest(`#comments-section-${project.id}`);
+      const interactionSection = target.closest('.interaction-section');
+      
+      if (!commentsSection && !interactionSection) {
+        setLocation(`/project/${project.id}`);
+      }
+    };;
 
   const handleInteractionClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -154,6 +155,20 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     e.stopPropagation();
     if (!address || !newComment.trim()) return;
     await createCommentMutation.mutate(newComment);
+  };
+
+  const handleUpvote = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!address) {
+      toast({
+        variant: "destructive",
+        description: "Please connect your wallet to upvote",
+        duration: 3000,
+      });
+      return;
+    }
+    await upvoteMutation.mutateAsync();
   };
 
   const progressPercentage = project.fundingProgress || 0;
@@ -352,7 +367,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                     className="text-primary hover:text-primary/80"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setLocation(`/projects/${project.id}?tab=discussion`);
+                      setLocation(`/project/${project.id}?tab=discussion`);
                     }}
                   >
                     View all {project.commentCount} comments

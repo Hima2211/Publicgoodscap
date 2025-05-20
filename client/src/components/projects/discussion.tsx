@@ -4,6 +4,8 @@ import { FaReply, FaHeart, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { useAccount } from 'wagmi';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface User {
   address: string;
@@ -31,6 +33,31 @@ export default function Discussion({ projectId }: DiscussionProps) {
   const [expandedComments, setExpandedComments] = useState<Set<number>>(new Set());
   const { address } = useAccount();
   const queryClient = useQueryClient();
+
+  // Set up WebSocket connection with event handlers
+  useWebSocket({
+    projectId,
+    onCommentAdded: (comment) => {
+      queryClient.setQueryData(['comments', projectId], (oldData: Comment[] | undefined) => {
+        if (!oldData) return [comment];
+        return [...oldData, comment];
+      });
+    },
+    onCommentUpdated: (updatedComment) => {
+      queryClient.setQueryData(['comments', projectId], (oldData: Comment[] | undefined) => {
+        if (!oldData) return [updatedComment];
+        return oldData.map(comment => 
+          comment.id === updatedComment.id ? updatedComment : comment
+        );
+      });
+    },
+    onCommentDeleted: (commentId) => {
+      queryClient.setQueryData(['comments', projectId], (oldData: Comment[] | undefined) => {
+        if (!oldData) return [];
+        return oldData.filter(comment => comment.id !== commentId);
+      });
+    }
+  });
 
   const { data: comments = [], isLoading } = useQuery<Comment[]>({
     queryKey: ['comments', projectId],

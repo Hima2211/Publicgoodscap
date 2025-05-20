@@ -26,7 +26,7 @@ export default function Leaderboard() {
     const dicebearUrl = `https://api.dicebear.com/7.x/shapes/svg?seed=${project.name}`;
     
     return (
-      <Link href={`/projects/${project.id}`} key={project.id}>
+      <Link href={`/project/${project.id}`} key={project.id}>
         <Card className="mb-3 bg-darkCard border-darkBorder hover:bg-darkCard/80 transition-colors cursor-pointer">
           <CardContent className="p-4">
             <div className="flex items-center gap-4">
