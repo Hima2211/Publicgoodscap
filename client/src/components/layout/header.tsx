@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Sun, Moon, Grid2x2Check, List } from "lucide-react";
+import { Search, Sun, Moon, Grid2x2Check, List, Compass, Trophy, BookOpen, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { walletConnect } from '@wagmi/connectors';
@@ -27,10 +27,27 @@ export default function Header({
   const [searchQuery, setSearchQuery] = useState("");
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [showSocials, setShowSocials] = useState(false);
+  const [githubRepoCount, setGithubRepoCount] = useState<number | null>(null);
 
   // Only access theme client-side to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // Fetch GitHub repo count for youBuidl (replace with actual org/repo if needed)
+    fetch('https://api.github.com/orgs/youBuidl/repos?per_page=1')
+      .then((res) => {
+        const total = res.headers.get('Link')?.match(/&page=(\d+)>; rel="last"/);
+        if (total && total[1]) {
+          setGithubRepoCount(Number(total[1]));
+        } else {
+          // fallback: count from first page
+          return res.json().then((data) => setGithubRepoCount(Array.isArray(data) ? data.length : null));
+        }
+      })
+      .catch(() => setGithubRepoCount(null));
   }, []);
 
   const navItems = [
@@ -54,7 +71,7 @@ export default function Header({
     }
   };
 
-  const { connect, isConnecting, connector, isDisconnected, } = useConnect();
+  const { connect } = useConnect();
   const { isConnected } = useAccount();
   const { disconnect } = useDisconnect();
 
@@ -139,7 +156,13 @@ export default function Header({
                   variant="default"
                   size="sm"
                   className="h-6 text-xs bg-accent hover:bg-accent/90 text-darkBg font-medium"
-                  onClick={() => connect({ connector: walletConnect })}
+                  onClick={() =>
+                    connect({
+                      connector: walletConnect({
+                        projectId: "37b5e2fccd46c838885f41186745251e",
+                      }),
+                    })
+                  }
                 >
                   Connect Wallet
                 </Button>
@@ -160,24 +183,28 @@ export default function Header({
             </Button>
           </div>
         </div>
+      </div>
 
-        {/* Market cap stats bar */}
-        <div className="flex items-center justify-between py-2 px-3 bg-darkCard text-xs">
-          <div className="flex items-center">
-            <span className="text-white text-sm font-medium">Market Cap</span>
-            <span className="ml-2 text-white text-sm">$2.08 T</span>
-            <span className="ml-1 text-green-400 text-sm">+0.18%</span>
-          </div>
-
-          <div className="flex rounded overflow-hidden border border-darkBorder h-5">
-            <button className="px-1.5 flex items-center text-[10px] bg-darkCard text-accent">
-              <Grid2x2Check className="h-2.5 w-2.5" />
-            </button>
-            <button className="px-1.5 flex items-center text-[10px] bg-darkBg text-darkText">
-              <List className="h-2.5 w-2.5" />
-            </button>
-          </div>
-        </div>
+      {/* Mobile Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-darkCard border-t border-darkBorder flex justify-around items-center py-2 md:hidden">
+        <Link href="/" className="flex flex-col items-center group">
+          <span className="relative">
+            <Compass className="w-7 h-7 text-accent group-hover:scale-110 transition-transform" />
+            <span className="absolute -top-1 -right-1 bg-accent text-xs text-darkBg rounded-full px-1.5 py-0.5 font-bold shadow">●</span>
+          </span>
+        </Link>
+        <Link href="/leaderboard" className="flex flex-col items-center group">
+          <span className="relative">
+            <Trophy className="w-7 h-7 text-accent group-hover:scale-110 transition-transform" />
+            <span className="absolute -top-1 -right-1 bg-accent text-xs text-darkBg rounded-full px-1.5 py-0.5 font-bold shadow">●</span>
+          </span>
+        </Link>
+        <Link href="/learn" className="flex flex-col items-center group">
+          <BookOpen className="w-7 h-7 text-darkText group-hover:text-accent group-hover:scale-110 transition-transform" />
+        </Link>
+        <Link href="/profile" className="flex flex-col items-center group">
+          <User className="w-7 h-7 text-darkText group-hover:text-accent group-hover:scale-110 transition-transform" />
+        </Link>
       </div>
 
       {/* Desktop header */}
@@ -248,7 +275,7 @@ export default function Header({
                 </span>
               </Link>
 
-              <nav className="flex space-x-4">
+              <nav className="flex space-x-4 items-center">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
@@ -262,6 +289,59 @@ export default function Header({
                     {item.label}
                   </Link>
                 ))}
+                {/* Socials Dropdown */}
+                <div className="relative">
+                  <button
+                    className="text-sm font-medium text-darkText hover:text-white transition-colors flex items-center focus:outline-none"
+                    onClick={() => setShowSocials((v) => !v)}
+                    onBlur={() => setTimeout(() => setShowSocials(false), 150)}
+                    type="button"
+                  >
+                    Socials
+                    <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  </button>
+                  {showSocials && (
+                    <div className="absolute right-0 mt-2 w-40 bg-darkCard border border-darkBorder rounded shadow-lg z-50 animate-fade-in">
+                      <a
+                        href="https://twitter.com/youBuidl"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block px-4 py-2 text-sm text-darkText hover:bg-accent/10 hover:text-accent transition-colors"
+                      >
+                        <span className="inline-block mr-2 align-middle">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22.46 5.924c-.793.352-1.646.59-2.542.698a4.48 4.48 0 0 0 1.965-2.475 8.94 8.94 0 0 1-2.828 1.082A4.48 4.48 0 0 0 16.11 4c-2.48 0-4.49 2.01-4.49 4.49 0 .352.04.695.116 1.022C7.728 9.36 4.1 7.57 1.67 4.95c-.387.664-.61 1.437-.61 2.26 0 1.56.794 2.94 2.003 3.75-.737-.023-1.43-.226-2.037-.563v.057c0 2.18 1.55 4 3.61 4.42-.377.103-.775.158-1.185.158-.29 0-.57-.028-.845-.08.57 1.78 2.23 3.08 4.2 3.12A8.98 8.98 0 0 1 2 19.54c-.65 0-1.29-.038-1.92-.112A12.7 12.7 0 0 0 7.29 21.5c8.39 0 12.98-6.95 12.98-12.98 0-.198-.004-.395-.013-.59A9.3 9.3 0 0 0 24 4.59a8.98 8.98 0 0 1-2.54.69z"/></svg>
+                        </span>
+                        Twitter
+                      </a>
+                      <a
+                        href="https://discord.gg/youBuidl"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block px-4 py-2 text-sm text-darkText hover:bg-accent/10 hover:text-accent transition-colors"
+                      >
+                        <span className="inline-block mr-2 align-middle">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.369A19.791 19.791 0 0 0 16.885 3.2a.112.112 0 0 0-.119.056c-.523.927-1.104 2.13-1.513 3.084a17.978 17.978 0 0 0-5.505 0c-.409-.954-.99-2.157-1.513-3.084a.112.112 0 0 0-.119-.056A19.791 19.791 0 0 0 3.683 4.369a.105.105 0 0 0-.047.043C.533 9.04-.32 13.579.099 18.057a.112.112 0 0 0 .042.078c2.104 1.547 4.13 2.488 6.102 3.104a.112.112 0 0 0 .123-.041c.47-.65.888-1.34 1.247-2.062a.112.112 0 0 0-.061-.155c-.662-.25-1.293-.548-1.902-.892a.112.112 0 0 1-.011-.188c.128-.096.256-.192.382-.29a.112.112 0 0 1 .115-.01c4.005 1.83 8.317 1.83 12.299 0a.112.112 0 0 1 .116.01c.126.098.254.194.382.29a.112.112 0 0 1-.011.188c-.609.344-1.24.642-1.902.892a.112.112 0 0 0-.061.155c.359.722.777 1.412 1.247 2.062a.112.112 0 0 0 .123.041c1.972-.616 3.998-1.557 6.102-3.104a.112.112 0 0 0 .042-.078c.5-5.177-.838-9.684-3.537-13.645a.105.105 0 0 0-.047-.043zM8.02 15.331c-1.183 0-2.156-1.085-2.156-2.419 0-1.333.955-2.418 2.156-2.418 1.21 0 2.174 1.094 2.156 2.418 0 1.334-.955 2.419-2.156 2.419zm7.96 0c-1.183 0-2.156-1.085-2.156-2.419 0-1.333.955-2.418 2.156-2.418 1.21 0 2.174 1.094 2.156 2.418 0 1.334-.955 2.419-2.156 2.419z"/></svg>
+                        </span>
+                        Discord
+                      </a>
+                    </div>
+                  )}
+                </div>
+                {/* GitHub Repo Count */}
+                <a
+                  href="https://github.com/youBuidl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-2 flex items-center px-2 py-1 bg-darkCard border border-darkBorder rounded text-sm font-medium text-darkText hover:text-accent transition-colors"
+                  title="GitHub Repos"
+                >
+                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.73 1.27 3.4.97.11-.75.41-1.27.74-1.56-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 2.9-.39c.98.01 1.97.13 2.9.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.43-2.7 5.41-5.27 5.7.42.36.79 1.09.79 2.2 0 1.59-.01 2.87-.01 3.26 0 .31.21.68.8.56C20.71 21.39 24 17.08 24 12c0-6.27-5.23-11.5-12-11.5z"/></svg>
+                  {githubRepoCount !== null ? (
+                    <span className="font-bold">{githubRepoCount}</span>
+                  ) : (
+                    <span className="font-bold">--</span>
+                  )}
+                </a>
               </nav>
             </div>
 
@@ -304,9 +384,7 @@ export default function Header({
                   onClick={() =>
                     connect({
                       connector: walletConnect({
-                        options: {
-                          projectId: "37b5e2fccd46c838885f41186745251e",
-                        },
+                        projectId: "37b5e2fccd46c838885f41186745251e",
                       }),
                     })
                   }

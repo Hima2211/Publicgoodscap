@@ -8,6 +8,7 @@ import Submit from "@/pages/submit";
 import Profile from "@/pages/profile";
 import Names from "@/pages/names";
 import Leaderboard from "@/pages/leaderboard";
+import LearnDocs from "@/pages/learn";
 import { ThemeProvider } from "next-themes";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -62,7 +63,8 @@ function App() {
                     <Route path="/submit" component={Submit} />
                     <Route path="/profile" component={Profile} />
                     <Route path="/leaderboard" component={Leaderboard} />
-                     <Route path="/names" component={Names} />
+                    <Route path="/names" component={Names} />
+                    <Route path="/learn" component={LearnDocs} />
                     <Route path="/admin/login" component={AdminLogin} />
                     <Route path="/admin">
                       {() => (
