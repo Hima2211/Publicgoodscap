@@ -11,6 +11,7 @@ import { walletConnect } from '@wagmi/connectors';
 import { ProfileHeader } from '@/components/profile/profile-header';
 import { ProfileStats } from '@/components/profile/profile-stats';
 import { Activity } from 'lucide-react';
+import { ProfileSkeleton } from '@/components/ui/skeletons';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -56,6 +57,10 @@ export default function Profile() {
     followers: fullStats?.followers ?? 0,
     following: fullStats?.following ?? 0
   };
+
+  if (isLoading || isStatsLoading) {
+    return <ProfileSkeleton />;
+  }
 
   if (!user) {
     return (

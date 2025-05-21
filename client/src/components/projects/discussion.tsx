@@ -6,6 +6,7 @@ import { Textarea } from '../ui/textarea';
 import { useAccount } from 'wagmi';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { CommentsSkeleton } from './comments/comment-skeletons';
 
 interface User {
   address: string;
@@ -246,11 +247,7 @@ export default function Discussion({ projectId }: DiscussionProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
-      </div>
-    );
+    return <CommentsSkeleton />;
   }
 
   return (

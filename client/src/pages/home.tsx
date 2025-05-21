@@ -13,6 +13,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Grid2x2Check, List } from "lucide-react";
+import { ProjectCardSkeleton } from "@/components/ui/skeletons";
 
 export default function Home() {
   const [view, setView] = useState<"cards" | "table">("cards");
@@ -36,6 +37,29 @@ export default function Home() {
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (isLoading) {
+    return (
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="hidden md:block">
+            <h1 className="text-2xl md:text-3xl font-display font-bold text-white">Public Goods Market Cap.</h1>
+            <p className="text-darkText mt-1">Discover, track and support the ecosystem's most impactful Public goods.</p>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-2 opacity-50">
+            <CategoryTabs activeCategory={category} onCategoryChange={setCategory} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <ProjectCardSkeleton key={i} />
+          ))}
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -102,46 +126,37 @@ export default function Home() {
         <CategoryTabs activeCategory={category} onCategoryChange={setCategory} />
       </div>
       
-      {/* Loading State */}
-      {isLoading && (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      )}
-      
       {/* Projects Display */}
-      {!isLoading && (
-        <>
-          {/* Card View */}
-          {view === "cards" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {currentProjects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
-              
-              {currentProjects.length === 0 && (
-                <div className="col-span-full py-12 text-center">
-                  <p className="text-darkText">No projects found matching your criteria.</p>
-                </div>
-              )}
-            </div>
-          )}
-          
-          {/* Table View */}
-          {view === "table" && (
-            <ProjectTable projects={currentProjects} />
-          )}
-          
-          {/* Pagination */}
-          {projects.length > 0 && (
-            <Pagination 
-              currentPage={currentPage} 
-              totalPages={totalPages} 
-              onPageChange={handlePageChange} 
-            />
-          )}
-        </>
-      )}
+      <>
+        {/* Card View */}
+        {view === "cards" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {currentProjects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+            
+            {currentProjects.length === 0 && (
+              <div className="col-span-full py-12 text-center">
+                <p className="text-darkText">No projects found matching your criteria.</p>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Table View */}
+        {view === "table" && (
+          <ProjectTable projects={currentProjects} />
+        )}
+        
+        {/* Pagination */}
+        {projects.length > 0 && (
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={handlePageChange} 
+          />
+        )}
+      </>
     </main>
   );
 }

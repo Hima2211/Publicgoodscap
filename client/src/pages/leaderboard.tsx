@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { Project } from '@shared/schema';
 import { formatCurrency } from '@/lib/utils';
-import { Loader2 } from 'lucide-react';
+import { LeaderboardSkeleton } from '@/components/ui/skeletons';
 
 type LeaderboardProject = Project & { rank: number };
 
@@ -21,6 +21,10 @@ export default function Leaderboard() {
       return response.json();
     }
   });
+
+  if (isLoading) {
+    return <LeaderboardSkeleton />;
+  }
 
   const renderLeaderboardItem = (project: LeaderboardProject) => {
     const dicebearUrl = `https://api.dicebear.com/7.x/shapes/svg?seed=${project.name}`;

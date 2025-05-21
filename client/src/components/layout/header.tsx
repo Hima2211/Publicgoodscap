@@ -35,7 +35,7 @@ export default function Header({
 
   const navItems = [
     { label: "Discover", href: "/" },
-    { label: "Categories", href: "/categories" },
+    { label: "YouBuidl Names", href: "/names" },
     { label: "Leaderboard", href: "/leaderboard" },
     { label: "Learn", href: "/learn" },
   ];

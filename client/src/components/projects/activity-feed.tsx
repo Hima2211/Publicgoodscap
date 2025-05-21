@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { FaComment, FaRetweet, FaDollarSign } from 'react-icons/fa';
 import { BiUpvote } from 'react-icons/bi';
+import { ActivityFeedSkeleton } from './activity-feed/activity-feed-skeleton';
 
 interface ActivityItem {
   id: number;
@@ -103,11 +104,7 @@ export default function ActivityFeed({ projectId }: ActivityFeedProps) {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
-      </div>
-    );
+    return <ActivityFeedSkeleton />;
   }
 
   return (

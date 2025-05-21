@@ -6,6 +6,7 @@ import Home from "@/pages/home";
 import ProjectDetails from "@/pages/project-details";
 import Submit from "@/pages/submit";
 import Profile from "@/pages/profile";
+import Names from "@/pages/names";
 import Leaderboard from "@/pages/leaderboard";
 import { ThemeProvider } from "next-themes";
 import Header from "@/components/layout/header";
@@ -61,6 +62,7 @@ function App() {
                     <Route path="/submit" component={Submit} />
                     <Route path="/profile" component={Profile} />
                     <Route path="/leaderboard" component={Leaderboard} />
+                     <Route path="/names" component={Names} />
                     <Route path="/admin/login" component={AdminLogin} />
                     <Route path="/admin">
                       {() => (
