@@ -16,7 +16,19 @@
   font-style: normal;
 }
 
+:root {
+  --platform-font-family: 'SF Pro Rounded Heavy', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html, body {
+  font-family: var(--platform-font-family);
+}
+
 @layer base {
+  html, body {
+    font-family: 'SF Pro Rounded Heavy', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
   body {
     font-family: "SF Pro Rounded Black", "-apple-system", "BlinkMacSystemFont", sans-serif;
   }

@@ -17,7 +17,20 @@ export default function Names() {
   return (
     <div className="min-h-screen bg-white dark:bg-darkBg flex items-center justify-center transition-colors">
       <section className="w-full max-w-2xl mx-auto text-center pt-24 pb-24 px-4 bg-white dark:bg-darkBg rounded-3xl shadow-sm transition-colors flex flex-col items-center justify-center min-h-[60vh]">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-black dark:text-white mb-6 tracking-tight">
+        <h1
+          className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-black dark:text-white"
+          style={{
+            fontFamily: 'SF Pro Rounded Heavy, -apple-system, BlinkMacSystemFont, sans-serif',
+            fontSize: 48,
+            fontStyle: 'normal',
+            fontWeight: 400,
+            letterSpacing: '-1px',
+            lineHeight: '1.1em',
+            textDecoration: 'none',
+            textTransform: 'none',
+            marginBottom: 40,
+          }}
+        >
           Claim your <span className="text-[#c5ed5e]">.youbuidl</span> & <span className="text-[#c5ed5e]">.givestation</span> name
         </h1>
         <p className="text-base md:text-lg text-gray-600 dark:text-blue-100 mb-10">
