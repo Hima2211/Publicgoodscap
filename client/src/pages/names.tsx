@@ -4,47 +4,51 @@ import { Button } from '@/components/ui/button';
 
 export default function Names() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle search logic here
-    console.log('Searching for:', searchQuery);
+    setIsSearching(true);
+    // Simulate search delay (replace with real search logic)
+    await new Promise((res) => setTimeout(res, 1200));
+    setIsSearching(false);
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="text-3xl font-bold text-center mb-6">YouBuidl Names</h1>
-      <p className="text-center text-gray-500 mb-8">
-        Discover and register unique .youbuidl and .givestation names for your projects.
-      </p>
-
-      <form onSubmit={handleSearch} className="flex justify-center mb-8">
-        <Input
-          type="text"
-          placeholder="Search for a name..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-1/2 bg-darkCard text-sm"
-        />
-        <Button type="submit" className="ml-4">
-          Search
-        </Button>
-      </form>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Example name cards */}
-        <div className="p-4 border border-darkBorder rounded-lg bg-darkCard">
-          <h2 className="text-lg font-bold text-white">example.youbuidl</h2>
-          <p className="text-sm text-gray-400">Available</p>
-          <Button className="mt-4 w-full">Register</Button>
-        </div>
-        <div className="p-4 border border-darkBorder rounded-lg bg-darkCard">
-          <h2 className="text-lg font-bold text-white">example.givestation</h2>
-          <p className="text-sm text-gray-400">Available</p>
-          <Button className="mt-4 w-full">Register</Button>
-        </div>
-        {/* Add more cards dynamically based on search results */}
-      </div>
+    <div className="min-h-screen bg-white dark:bg-darkBg flex items-center justify-center transition-colors">
+      <section className="w-full max-w-2xl mx-auto text-center pt-24 pb-24 px-4 bg-white dark:bg-darkBg rounded-3xl shadow-sm transition-colors flex flex-col items-center justify-center min-h-[60vh]">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-black dark:text-white mb-6 tracking-tight">
+          Claim your <span className="text-[#c5ed5e]">.youbuidl</span> & <span className="text-[#c5ed5e]">.givestation</span> name
+        </h1>
+        <p className="text-base md:text-lg text-gray-600 dark:text-blue-100 mb-10">
+          Own your digital identity. Register a unique name for your project, community, or yourself on the next generation of web3.
+        </p>
+        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row justify-center gap-2 w-full max-w-xl mx-auto relative">
+          <Input
+            type="text"
+            placeholder="Search for a name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-gray-100 dark:bg-white/10 text-base px-4 py-3 rounded-full border border-gray-200 dark:border-white/20 focus:ring-2 focus:ring-[#c5ed5e] text-black dark:text-white shadow-sm placeholder:text-gray-400 dark:placeholder:text-blue-200 pr-12"
+            disabled={isSearching}
+            autoFocus
+          />
+          <Button
+            type="submit"
+            className="text-base px-6 py-3 rounded-full font-bold bg-gradient-to-r from-[#c5ed5e] to-[#60A5FA] text-[#0A1A3C] shadow-md hover:scale-105 transition-transform min-w-[120px]"
+            disabled={isSearching || !searchQuery.trim()}
+          >
+            {isSearching ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="animate-spin inline-block w-5 h-5 border-2 border-t-transparent border-[#60A5FA] rounded-full"></span>
+                Searching
+              </span>
+            ) : (
+              'Search'
+            )}
+          </Button>
+        </form>
+      </section>
     </div>
   );
 }
