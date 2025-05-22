@@ -24,13 +24,13 @@ export default function Submit() {
         <Card className="bg-card border-border text-foreground transition-colors duration-500">
           <CardHeader>
             <CardTitle>Submit Your Project</CardTitle>
-            <CardDescription>Choose how you want to submit your project</CardDescription>
+            <CardDescription className="font-normal">Choose how you want to submit your project</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="direct" value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="direct">Direct Submission</TabsTrigger>
-                <TabsTrigger value="external">External Platform</TabsTrigger>
+                <TabsTrigger value="direct" className="font-medium">Direct Submission</TabsTrigger>
+                <TabsTrigger value="external" className="font-medium">External Platform</TabsTrigger>
               </TabsList>
               <TabsContent value="direct">
                 <div className="space-y-6 pt-4">

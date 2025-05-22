@@ -281,11 +281,7 @@ export default function Header({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`text-sm font-medium ${
-                      location === item.href
-                        ? "text-accent"
-                        : "text-foreground hover:text-accent"
-                    } transition-colors`}
+                    className={`px-3 py-2 rounded-md text-sm font-normal transition-colors duration-200 ${location === item.href ? 'text-primary bg-muted' : 'text-muted-foreground hover:text-foreground'}`}
                   >
                     {item.label}
                   </Link>
@@ -293,7 +289,7 @@ export default function Header({
                 {/* Socials Dropdown */}
                 <div className="relative">
                   <button
-                    className="text-sm font-medium text-darkText hover:text-white transition-colors flex items-center focus:outline-none"
+                    className="text-sm font-normal text-darkText hover:text-white transition-colors flex items-center focus:outline-none"
                     onClick={() => setShowSocials((v) => !v)}
                     onBlur={() => setTimeout(() => setShowSocials(false), 150)}
                     type="button"

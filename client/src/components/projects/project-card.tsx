@@ -310,9 +310,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           <div className="overflow-hidden">
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-base text-foreground truncate">{project.name}</h3>
-              <span className={`badge ${categoryClass} text-xs text-foreground`}>{getCategoryName(project.category)}</span>
+              <span className={`badge ${categoryClass} text-xs font-normal text-foreground`}>{getCategoryName(project.category)}</span>
             </div>
-            <p className="text-foreground text-sm line-clamp-2">
+            <p className="text-foreground text-sm font-normal line-clamp-2">
               {project.description}
             </p>
           </div>
@@ -328,9 +328,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </span>
             
             {StatusIcon && (
-              <span className={`text-sm font-medium ${statusColor} flex items-center gap-1`}>
+              <span className={`text-sm font-normal ${statusColor} flex items-center gap-1`}>
                 <StatusIcon className="h-3.5 w-3.5" />
-                <span className="text-xs text-foreground">{statusText}</span>
+                <span className="text-xs font-normal text-foreground">{statusText}</span>
               </span>
             )}
           </div>

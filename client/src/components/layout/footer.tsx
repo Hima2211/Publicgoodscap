@@ -29,7 +29,7 @@ export default function Footer() {
                 <Icon 
                   className={`w-5 h-5 mb-1 ${isActive ? 'text-accent' : 'text-darkText'}`} 
                 />
-                <span className={`text-xs ${isActive ? 'text-accent' : 'text-darkText'}`}>
+                <span className={`text-xs font-normal ${isActive ? 'text-accent' : 'text-darkText'}`}>
                   {item.label}
                 </span>
               </Link>
@@ -64,13 +64,13 @@ export default function Footer() {
             </div>
             
             <div className="flex flex-wrap justify-center space-x-4 text-xs">
-              <Link href="/terms" className="text-darkText hover:text-white transition-colors">Terms</Link>
-              <Link href="/privacy" className="text-darkText hover:text-white transition-colors">Privacy</Link>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-darkText hover:text-white transition-colors">Twitter</a>
-              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="text-darkText hover:text-white transition-colors">Discord</a>
+              <Link href="/terms" className="text-darkText font-normal hover:text-white transition-colors">Terms</Link>
+              <Link href="/privacy" className="text-darkText font-normal hover:text-white transition-colors">Privacy</Link>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-darkText font-normal hover:text-white transition-colors">Twitter</a>
+              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="text-darkText font-normal hover:text-white transition-colors">Discord</a>
             </div>
             
-            <p className="text-xs text-darkText mt-4 md:mt-0">© {new Date().getFullYear()} GiveStation.</p>
+            <p className="text-xs text-darkText font-normal mt-4 md:mt-0">© {new Date().getFullYear()} GiveStation.</p>
           </div>
         </div>
       </footer>

@@ -40,15 +40,15 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
       <table className="w-full min-w-[1000px] border-collapse">
         <thead>
           <tr className="border-b border-darkBorder">
-            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">#</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Project</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Total Funding</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Category</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Funding Status</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Round</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Links</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Funding Sources</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Actions</th>
+            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">#</th>
+            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Project</th>
+            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Total Funding</th>
+            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Category</th>
+            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Funding Status</th>
+            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Round</th>
+            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Links</th>
+            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Funding Sources</th>
+            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -138,8 +138,8 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                         className="w-8 h-8 rounded-md flex-shrink-0 object-cover" 
                       />
                       <div>
-                        <h3 className="font-medium text-white">{project.name}</h3>
-                        <p className="text-xs text-darkText truncate max-w-[200px]">{project.description}</p>
+                        <h3 className="font-bold text-white">{project.name}</h3>
+                        <p className="text-xs font-normal text-darkText truncate max-w-[200px]">{project.description}</p>
                       </div>
                     </div>
                   </td>
@@ -147,7 +147,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                     <span className="font-medium text-foreground">{formatCurrency(project.totalFunding)}</span>
                   </td>
                   <td className="px-4 py-4">
-                    <span className={`badge ${categoryMap[project.category] || ''} text-xs`}>
+                    <span className={`badge ${categoryMap[project.category] || ''} text-xs font-normal`}>
                       {getCategoryName(project.category)}
                     </span>
                   </td>
