@@ -4,6 +4,7 @@ import { Server as SocketServer, Socket } from "socket.io";
 import { storage } from "./storage";
 import { FundingStatusEnum, ProjectStatusEnum, CategoryEnum, insertCommentSchema, insertActivitySchema } from "@shared/schema";
 import { z } from "zod";
+import fetch from 'node-fetch';
 
 interface ClientToServerEvents {
   "join-project": (projectId: number) => void;
@@ -235,6 +236,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error importing project:", error);
       res.status(500).json({ message: "Failed to import project" });
+    }
+  });
+
+  // --- Gitcoin Proxy Route ---
+  app.post('/api/gitcoin', async (req, res) => {
+    try {
+      const response = await fetch('https://grants-stack-indexer-v2.gitcoin.co/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req.body),
+      });
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error('Error proxying Gitcoin GraphQL:', error);
+      res.status(500).json({ message: 'Failed to fetch from Gitcoin' });
     }
   });
 

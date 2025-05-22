@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Grid2x2Check, List } from "lucide-react";
 import { ProjectCardSkeleton } from "@/components/ui/skeletons";
+import { fetchGitcoinProjects } from "@/lib/gitcoin";
 
 export default function Home() {
   const [view, setView] = useState<"cards" | "table">("cards");
@@ -21,17 +22,46 @@ export default function Home() {
   const [category, setCategory] = useState("all");
   const [sortBy, setSortBy] = useState("trending");
   const [searchQuery, setSearchQuery] = useState("");
-  
+  const [useGitcoin, setUseGitcoin] = useState(false);
+  const [gitcoinProjects, setGitcoinProjects] = useState<any[]>([]);
+  const [gitcoinLoading, setGitcoinLoading] = useState(false);
+  const [gitcoinError, setGitcoinError] = useState<string | null>(null);
+
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["/api/projects", category, sortBy, searchQuery],
   });
 
+  useEffect(() => {
+    let cancelled = false;
+    if (!useGitcoin) return;
+    if (gitcoinLoading) return; // Prevent duplicate fetches
+    setGitcoinLoading(true);
+    setGitcoinError(null);
+    fetchGitcoinProjects({ first: 18 })
+      .then((fetched) => {
+        if (!cancelled) {
+          setGitcoinProjects(fetched);
+          setGitcoinLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setGitcoinError("Failed to fetch Gitcoin projects");
+          setGitcoinLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [useGitcoin]);
+
   // Calculate pagination
   const projectsPerPage = 9;
-  const totalPages = Math.ceil(projects.length / projectsPerPage);
+  const allProjects = useGitcoin ? gitcoinProjects : projects;
+  const totalPages = Math.ceil(allProjects.length / projectsPerPage);
   const indexOfLastProject = currentPage * projectsPerPage;
   const indexOfFirstProject = indexOfLastProject - projectsPerPage;
-  const currentProjects = projects.slice(indexOfFirstProject, indexOfLastProject);
+  const currentProjects = allProjects.slice(indexOfFirstProject, indexOfLastProject);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -118,6 +148,14 @@ export default function Home() {
               <span className="hidden sm:inline">Table</span>
             </button>
           </div>
+
+          {/* Gitcoin/Local Toggle Button */}
+          <button
+            className={`px-3 py-1 rounded border text-xs font-medium transition-colors ${useGitcoin ? 'bg-primary text-white' : 'bg-card text-darkText border-border'}`}
+            onClick={() => setUseGitcoin((v) => !v)}
+          >
+            {useGitcoin ? 'Show Local Projects' : 'Show Gitcoin Projects'}
+          </button>
         </div>
       </div>
       
@@ -131,11 +169,17 @@ export default function Home() {
         {/* Card View */}
         {view === "cards" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {currentProjects.map((project) => (
+            {gitcoinLoading && useGitcoin && (
+              <div className="col-span-full py-12 text-center text-darkText">Loading Gitcoin projects...</div>
+            )}
+            {gitcoinError && useGitcoin && (
+              <div className="col-span-full py-12 text-center text-red-500">{gitcoinError}</div>
+            )}
+            {!gitcoinLoading && !gitcoinError && currentProjects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
             
-            {currentProjects.length === 0 && (
+            {currentProjects.length === 0 && !gitcoinLoading && !gitcoinError && (
               <div className="col-span-full py-12 text-center">
                 <p className="text-darkText">No projects found matching your criteria.</p>
               </div>
@@ -149,7 +193,7 @@ export default function Home() {
         )}
         
         {/* Pagination */}
-        {projects.length > 0 && (
+        {allProjects.length > 0 && (
           <Pagination 
             currentPage={currentPage} 
             totalPages={totalPages} 

@@ -31,9 +31,12 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
     'social': ''
   };
 
-  const handleRowClick = (projectId: number) => {
+  const handleRowClick = (projectId: string | number) => {
     setLocation(`/project/${projectId}`);
   };
+
+  // Use the projects prop directly
+  const displayProjects = projects || [];
   
   return (
     <div className="mb-8 overflow-x-auto table-container">
@@ -52,41 +55,43 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
           </tr>
         </thead>
         <tbody>
-          {projects.length === 0 ? (
+          {displayProjects.length === 0 ? (
             <tr>
               <td colSpan={9} className="px-4 py-8 text-center text-darkText">
                 No projects found matching your criteria.
               </td>
             </tr>
           ) : (
-            projects.map((project, index) => {
-              // Progress percentage
-              const progressPercentage = project.fundingProgress || 0;
-              
+            displayProjects.map((project: any, index: number) => {
+              // Robust mapping for both local and Gitcoin projects
+              const name = project.name || project.title || 'Untitled';
+              const logo = project.logo || project.logoImageUrl || '/placeholder-logo.png';
+              const description = project.description || '';
+              const totalFunding = Number(project.totalFunding ?? project.totalAmountDonatedInUsd ?? 0);
+              const category = project.category || (Array.isArray(project.tags) && project.tags[0]) || 'public_goods';
+              const round = project.roundId || project.roundMetaPtr || '-';
+              const fundingSources = project.fundingSources || (project.roundId ? ['Gitcoin'] : []);
+              const progressPercentage = project.fundingProgress ?? 0;
               // Determine progress bar color classes
               let progressColorClasses = 'bg-primary';
               if (progressPercentage === 100) {
                 progressColorClasses = 'bg-success';
-              } else if (project.category === 'defi') {
+              } else if (category === 'defi') {
                 progressColorClasses = 'bg-gradient-to-r from-primary to-secondary';
-              } else if (project.category === 'nft') {
+              } else if (category === 'nft') {
                 progressColorClasses = 'bg-gradient-to-r from-accent to-secondary';
               }
-              
               // Round status
               let roundStatusClass = 'bg-success bg-opacity-10 text-success';
               let roundStatusText = 'Open';
-              
               if (!project.inFundingRound || progressPercentage === 100) {
                 roundStatusClass = 'bg-darkBorder text-darkText';
                 roundStatusText = 'Closed';
               } else if (project.isTrending) {
                 roundStatusClass = 'bg-warning bg-opacity-10 text-warning';
               }
-              
               // Social media icons
               const socialIcons = [];
-              
               if (project.twitter) {
                 socialIcons.push(
                   <a key="twitter" href={project.twitter} className="social-icon text-darkText hover:text-primary" aria-label="Twitter" target="_blank" rel="noopener noreferrer" onClick={handleLinkClick}>
@@ -94,7 +99,6 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                   </a>
                 );
               }
-              
               if (project.discord) {
                 socialIcons.push(
                   <a key="discord" href={project.discord} className="social-icon text-darkText hover:text-primary" aria-label="Discord" target="_blank" rel="noopener noreferrer" onClick={handleLinkClick}>
@@ -102,7 +106,6 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                   </a>
                 );
               }
-              
               if (project.telegram) {
                 socialIcons.push(
                   <a key="telegram" href={project.telegram} className="social-icon text-darkText hover:text-primary" aria-label="Telegram" target="_blank" rel="noopener noreferrer" onClick={handleLinkClick}>
@@ -110,7 +113,6 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                   </a>
                 );
               }
-              
               if (project.github) {
                 socialIcons.push(
                   <a key="github" href={project.github} className="social-icon text-darkText hover:text-primary" aria-label="GitHub" target="_blank" rel="noopener noreferrer" onClick={handleLinkClick}>
@@ -118,7 +120,6 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                   </a>
                 );
               }
-              
               if (project.website) {
                 socialIcons.push(
                   <a key="website" href={project.website} className="social-icon text-darkText hover:text-primary" aria-label="Website" target="_blank" rel="noopener noreferrer" onClick={handleLinkClick}>
@@ -126,29 +127,29 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                   </a>
                 );
               }
-              
+              const rowId = project.id;
               return (
-                <tr key={project.id} className="border-b border-darkBorder hover:bg-darkCard transition-colors cursor-pointer" onClick={() => handleRowClick(project.id)}>
+                <tr key={rowId} className="border-b border-darkBorder hover:bg-darkCard transition-colors cursor-pointer" onClick={() => handleRowClick(rowId)}>
                   <td className="px-4 py-4 text-sm">{index + 1}</td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <img 
-                        src={project.logo} 
-                        alt={`${project.name} logo`} 
+                        src={logo} 
+                        alt={`${name} logo`} 
                         className="w-8 h-8 rounded-md flex-shrink-0 object-cover" 
                       />
                       <div>
-                        <h3 className="font-bold text-white">{project.name}</h3>
-                        <p className="text-xs font-normal text-darkText truncate max-w-[200px]">{project.description}</p>
+                        <h3 className="font-bold text-white">{name}</h3>
+                        <p className="text-xs font-normal text-darkText truncate max-w-[200px]">{description}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-4">
-                    <span className="font-medium text-foreground">{formatCurrency(project.totalFunding)}</span>
+                    <span className="font-medium text-foreground">{formatCurrency(totalFunding)}</span>
                   </td>
                   <td className="px-4 py-4">
-                    <span className={`badge ${categoryMap[project.category] || ''} text-xs font-normal`}>
-                      {getCategoryName(project.category)}
+                    <span className={`badge ${categoryMap[category] || ''} text-xs font-normal`}>
+                      {getCategoryName(category)}
                     </span>
                   </td>
                   <td className="px-4 py-4">
@@ -164,7 +165,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                   </td>
                   <td className="px-4 py-4">
                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${roundStatusClass}`}>
-                      {roundStatusText}
+                      {round || '-'}
                     </span>
                   </td>
                   <td className="px-4 py-4">
@@ -173,28 +174,24 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                     </div>
                   </td>
                   <td className="px-4 py-4 text-sm">
-                    {project.fundingSources?.length 
-                      ? project.fundingSources.join(', ') 
+                    {fundingSources.length > 0 
+                      ? fundingSources.join(', ') 
                       : '-'
                     }
                   </td>
                   <td className="px-4 py-4">
                     <Button
                       size="sm"
-                      className={`${
-                        project.inFundingRound && progressPercentage < 100
-                          ? 'bg-primary hover:bg-opacity-90'
-                          : 'bg-darkCard hover:bg-opacity-90'
-                      } text-white rounded-lg px-3 py-1.5 text-xs font-medium transition-colors h-8`}
+                      className={`bg-primary text-white rounded-lg px-3 py-1.5 text-xs font-medium transition-colors h-8`}
                       asChild
                     >
                       <a 
-                        href={project.fundingRoundLink || '#'} 
+                        href={project.fundingRoundLink || project.website || '#'} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         onClick={handleLinkClick}
                       >
-                        {project.inFundingRound && progressPercentage < 100 ? 'Fund' : 'Donate'}
+                        Fund
                       </a>
                     </Button>
                   </td>
