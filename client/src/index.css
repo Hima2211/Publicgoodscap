@@ -31,11 +31,19 @@ html, body {
 
   body {
     font-family: "SF Pro Rounded Black", "-apple-system", "BlinkMacSystemFont", sans-serif;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    transition: background-color 0.5s, color 0.5s;
   }
+
+  .dark body {
+    transition: background-color 0.5s, color 0.5s;
+  }
+
   :root {
     /* Light mode - pure white background */
     --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
+    --foreground: 224 71.4% 12%; /* Softer black for light mode */
     --muted: 220 14.3% 95.9%;
     --muted-foreground: 220 8.9% 46.1%;
     --popover: 0 0% 100%;
@@ -101,10 +109,6 @@ html, body {
 
   * {
     @apply border-border;
-  }
-
-  body {
-    @apply font-sans bg-background text-foreground;
   }
 }
 
@@ -186,6 +190,18 @@ html, body {
   .scrollbar-color-adaptive {
     scrollbar-color: hsl(var(--muted-foreground) / 0.5) hsl(var(--muted) / 0.5);
   }
+}
+
+.text-foreground {
+  font-weight: 400;
+}
+
+.text-foreground.thin, .text-foreground:not(.font-bold):not(.font-semibold):not(.font-extrabold):not(.font-black) {
+  font-weight: 400 !important;
+}
+
+.text-foreground.title, .font-bold, .font-semibold, .font-extrabold, .font-black {
+  font-weight: 700 !important;
 }
 
 @keyframes bounce-short {

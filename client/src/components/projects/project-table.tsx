@@ -42,12 +42,12 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
           <tr className="border-b border-darkBorder">
             <th className="px-4 py-3 text-left text-sm font-medium text-darkText">#</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Project</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Total Funding</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Category</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Links</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Funding Status</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Round</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Links</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Funding Sources</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Total Funding</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-darkText">Actions</th>
           </tr>
         </thead>
@@ -144,14 +144,12 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                     </div>
                   </td>
                   <td className="px-4 py-4">
+                    <span className="font-medium text-foreground">{formatCurrency(project.totalFunding)}</span>
+                  </td>
+                  <td className="px-4 py-4">
                     <span className={`badge ${categoryMap[project.category] || ''} text-xs`}>
                       {getCategoryName(project.category)}
                     </span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex space-x-2">
-                      {socialIcons}
-                    </div>
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2">
@@ -169,14 +167,16 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                       {roundStatusText}
                     </span>
                   </td>
+                  <td className="px-4 py-4">
+                    <div className="flex space-x-2">
+                      {socialIcons}
+                    </div>
+                  </td>
                   <td className="px-4 py-4 text-sm">
                     {project.fundingSources?.length 
                       ? project.fundingSources.join(', ') 
                       : '-'
                     }
-                  </td>
-                  <td className="px-4 py-4 text-sm font-medium">
-                    {formatCurrency(project.totalFunding)}
                   </td>
                   <td className="px-4 py-4">
                     <Button

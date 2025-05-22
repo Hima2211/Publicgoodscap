@@ -6,7 +6,7 @@ export function Skeleton({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("animate-pulse rounded-md bg-darkBorder/50", className)}
+      className={cn("animate-pulse rounded-md bg-border/50 dark:bg-darkBorder/50 transition-colors duration-300", className)}
       {...props}
     />
   );
@@ -14,7 +14,7 @@ export function Skeleton({
 
 export function ProjectCardSkeleton() {
   return (
-    <div className="border border-darkBorder rounded-xl overflow-hidden bg-darkCard">
+    <div className="border border-border dark:border-darkBorder rounded-xl overflow-hidden bg-card dark:bg-darkCard transition-colors duration-500">
       <div className="p-4">
         <div className="flex gap-3">
           <Skeleton className="h-10 w-10 rounded-lg flex-shrink-0" />
@@ -45,7 +45,7 @@ export function ProjectCardSkeleton() {
           </div>
         </div>
       </div>
-      <div className="px-4 py-3 border-t border-darkBorder">
+      <div className="px-4 py-3 border-t border-border dark:border-darkBorder">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Skeleton className="h-4 w-16" />
@@ -90,7 +90,7 @@ export function ProjectDetailsSkeleton() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-darkCard rounded-xl p-6 border border-darkBorder">
+          <div key={i} className="bg-card dark:bg-darkCard rounded-xl p-6 border border-border dark:border-darkBorder transition-colors duration-500">
             <Skeleton className="h-6 w-32 mb-4" />
             <div className="space-y-4">
               <Skeleton className="h-4 w-full" />
@@ -101,8 +101,8 @@ export function ProjectDetailsSkeleton() {
         ))}
       </div>
 
-      <div className="bg-darkCard rounded-xl border border-darkBorder overflow-hidden">
-        <div className="border-b border-darkBorder">
+      <div className="bg-card dark:bg-darkCard rounded-xl border border-border dark:border-darkBorder overflow-hidden transition-colors duration-500">
+        <div className="border-b border-border dark:border-darkBorder">
           <div className="flex">
             <Skeleton className="h-12 w-1/2" />
             <Skeleton className="h-12 w-1/2" />
@@ -156,7 +156,7 @@ export function LeaderboardSkeleton() {
       </div>
       <div className="space-y-3">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="bg-darkCard rounded-lg p-4 border border-darkBorder">
+          <div key={i} className="bg-card dark:bg-darkCard rounded-lg p-4 border border-border dark:border-darkBorder transition-colors duration-500">
             <div className="flex items-center gap-4">
               <Skeleton className="h-8 w-8" />
               <Skeleton className="h-12 w-12 rounded-full" />

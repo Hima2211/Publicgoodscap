@@ -19,9 +19,9 @@ export default function Submit() {
   const [activeTab, setActiveTab] = useState("direct");
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background transition-colors duration-500">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-        <Card className="bg-darkCard border-darkBorder">
+        <Card className="bg-card border-border text-foreground transition-colors duration-500">
           <CardHeader>
             <CardTitle>Submit Your Project</CardTitle>
             <CardDescription>Choose how you want to submit your project</CardDescription>

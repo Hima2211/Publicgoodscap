@@ -15,10 +15,10 @@ export default function Names() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-darkBg flex items-center justify-center transition-colors">
-      <section className="w-full max-w-2xl mx-auto text-center pt-24 pb-24 px-4 bg-white dark:bg-darkBg rounded-3xl shadow-sm transition-colors flex flex-col items-center justify-center min-h-[60vh]">
+    <div className="min-h-screen bg-background flex items-center justify-center transition-colors duration-500">
+      <section className="w-full max-w-2xl mx-auto text-center pt-24 pb-24 px-4 bg-card rounded-3xl shadow-sm transition-colors flex flex-col items-center justify-center min-h-[60vh]">
         <h1
-          className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-black dark:text-white"
+          className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-foreground"
           style={{
             fontFamily: 'SF Pro Rounded Heavy, -apple-system, BlinkMacSystemFont, sans-serif',
             fontSize: 48,
@@ -33,7 +33,7 @@ export default function Names() {
         >
           Claim your <span className="text-[#c5ed5e]">.youbuidl</span> & <span className="text-[#c5ed5e]">.givestation</span> name
         </h1>
-        <p className="text-base md:text-lg text-gray-600 dark:text-blue-100 mb-10">
+        <p className="text-base md:text-lg text-foreground mb-10">
           Own your digital identity. Register a unique name for your project, community, or yourself on the next generation of web3.
         </p>
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row justify-center gap-2 w-full max-w-xl mx-auto relative">

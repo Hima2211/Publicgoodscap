@@ -15,7 +15,7 @@ export default function Footer() {
   return (
     <>
       {/* Mobile Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-darkCard border-t border-darkBorder md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border flex justify-around items-center py-2 md:hidden transition-colors duration-500">
         <nav className="flex justify-around items-center py-2 px-4">
           {mobileNavItems.map((item) => {
             const Icon = item.icon;
@@ -39,7 +39,7 @@ export default function Footer() {
       </div>
 
       {/* Desktop Footer */}
-      <footer className="bg-darkCard border-t border-darkBorder py-4 mt-12 hidden md:block">
+      <footer className="bg-card border-t border-border py-4 mt-12 hidden md:block transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-4 md:mb-0">

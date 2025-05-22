@@ -43,8 +43,8 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="hidden md:block">
-            <h1 className="text-2xl md:text-3xl font-display font-bold text-white">Public Goods Market Cap.</h1>
-            <p className="text-darkText mt-1">Discover, track and support the ecosystem's most impactful Public goods.</p>
+            <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">Public Goods Market Cap.</h1>
+            <p className="text-foreground mt-1">Discover, track and support the ecosystem's most impactful Public goods.</p>
           </div>
           
           <div className="flex flex-wrap items-center gap-2 opacity-50">
@@ -66,14 +66,14 @@ export default function Home() {
       {/* View Controls & Filters */}
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="hidden md:block">
-          <h1 className="text-2xl md:text-3xl font-display font-bold text-white">Public Goods Market Cap.</h1>
-          <p className="text-darkText mt-1">Discover, track and support the ecosystem's most impactful Public goods.</p>
+          <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">Public Goods Market Cap.</h1>
+          <p className="text-foreground mt-1">Discover, track and support the ecosystem's most impactful Public goods.</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="w-full md:w-32 bg-darkCard border-darkBorder rounded-lg h-8 text-xs">
+              <SelectTrigger className="w-full md:w-32 bg-card border-border rounded-lg h-8 text-xs text-foreground transition-colors duration-500">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
@@ -90,7 +90,7 @@ export default function Home() {
           
           <div className="relative">
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full md:w-36 bg-darkCard border-darkBorder rounded-lg h-8 text-xs">
+              <SelectTrigger className="w-full md:w-36 bg-card border-border rounded-lg h-8 text-xs text-foreground transition-colors duration-500">
                 <SelectValue placeholder="Sort by: Trending" />
               </SelectTrigger>
               <SelectContent>
@@ -102,16 +102,16 @@ export default function Home() {
             </Select>
           </div>
           
-          <div className="flex border border-darkBorder rounded-lg overflow-hidden">
+          <div className="flex border border-border rounded-lg overflow-hidden">
             <button 
-              className={`px-3 py-2 text-sm flex items-center gap-1 ${view === 'cards' ? 'bg-darkCard' : 'bg-darkBg'}`}
+              className={`px-3 py-2 text-sm flex items-center gap-1 ${view === 'cards' ? 'bg-card text-foreground' : 'bg-background text-foreground'} transition-colors duration-500`}
               onClick={() => setView("cards")}
             >
               <Grid2x2Check className={`h-4 w-4 ${view === 'cards' ? 'text-primary' : 'text-darkText'}`} />
               <span className="hidden sm:inline">Cards</span>
             </button>
             <button 
-              className={`px-3 py-2 text-sm flex items-center gap-1 ${view === 'table' ? 'bg-darkCard' : 'bg-darkBg'}`}
+              className={`px-3 py-2 text-sm flex items-center gap-1 ${view === 'table' ? 'bg-card text-foreground' : 'bg-background text-foreground'} transition-colors duration-500`}
               onClick={() => setView("table")}
             >
               <List className={`h-4 w-4 ${view === 'table' ? 'text-primary' : 'text-darkText'}`} />

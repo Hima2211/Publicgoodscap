@@ -76,11 +76,11 @@ export default function Header({
   const { disconnect } = useDisconnect();
 
   return (
-    <header className="bg-darkBg border-b border-darkBorder sticky top-0 z-50">
+    <header className="bg-background border-b border-border sticky top-0 z-50 transition-colors duration-500">
       {/* Mobile header */}
       <div className="md:hidden">
         {/* Logo and theme toggle */}
-        <div className="flex items-center justify-between py-2 px-3 bg-darkBg border-b border-darkBorder text-xs">
+        <div className="flex items-center justify-between py-2 px-3 bg-background border-b border-border text-xs transition-colors duration-500">
           <Link href="/" className="flex items-center">
             <svg
               width="32"
@@ -138,7 +138,7 @@ export default function Header({
                 fill="#070707"
               />
             </svg>
-            <span className="ml-1 text-sm font-bold text-white">youBuidl</span>
+            <span className="ml-1 text-sm font-bold text-foreground">youBuidl</span>
           </Link>
 
           <div className="flex items-center space-x-2">
@@ -171,14 +171,15 @@ export default function Header({
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 rounded-full"
+              className={`rounded-full border border-border shadow transition-all duration-300 focus:ring-2 focus:ring-accent/60 bg-card hover:bg-muted`}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
               {mounted &&
                 (theme === "dark" ? (
-                  <Sun className="h-3 w-3 text-accent" />
+                  <Sun className="h-3 w-3 text-accent transition-transform duration-300 rotate-0 scale-100" />
                 ) : (
-                  <Moon className="h-3 w-3 text-accent" />
+                  <Moon className="h-3 w-3 text-accent transition-transform duration-300 rotate-0 scale-100" />
                 ))}
             </Button>
           </div>
@@ -186,7 +187,7 @@ export default function Header({
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-darkCard border-t border-darkBorder flex justify-around items-center py-2 md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border flex justify-around items-center py-2 md:hidden">
         <Link href="/" className="flex flex-col items-center group">
           <span className="relative">
             <Compass className="w-7 h-7 text-accent group-hover:scale-110 transition-transform" />
@@ -270,7 +271,7 @@ export default function Header({
                     fill="#070707"
                   />
                 </svg>
-                <span className="ml-2 text-xl font-bold text-white">
+                <span className="ml-2 text-xl font-bold text-foreground">
                   youBuidl
                 </span>
               </Link>
@@ -283,7 +284,7 @@ export default function Header({
                     className={`text-sm font-medium ${
                       location === item.href
                         ? "text-accent"
-                        : "text-darkText hover:text-white"
+                        : "text-foreground hover:text-accent"
                     } transition-colors`}
                   >
                     {item.label}
@@ -301,7 +302,7 @@ export default function Header({
                     <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                   </button>
                   {showSocials && (
-                    <div className="absolute right-0 mt-2 w-40 bg-darkCard border border-darkBorder rounded shadow-lg z-50 animate-fade-in">
+                    <div className="absolute right-0 mt-2 w-40 bg-card border border-border rounded shadow-lg z-50 animate-fade-in">
                       <a
                         href="https://twitter.com/youBuidl"
                         target="_blank"
@@ -332,7 +333,7 @@ export default function Header({
                   href="https://github.com/youBuidl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-2 flex items-center px-2 py-1 bg-darkCard border border-darkBorder rounded text-sm font-medium text-darkText hover:text-accent transition-colors"
+                  className="ml-2 flex items-center px-2 py-1 bg-card border border-border rounded text-sm font-medium text-foreground hover:text-accent transition-colors"
                   title="GitHub Repos"
                 >
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.73 1.27 3.4.97.11-.75.41-1.27.74-1.56-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 2.9-.39c.98.01 1.97.13 2.9.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.43-2.7 5.41-5.27 5.7.42.36.79 1.09.79 2.2 0 1.59-.01 2.87-.01 3.26 0 .31.21.68.8.56C20.71 21.39 24 17.08 24 12c0-6.27-5.23-11.5-12-11.5z"/></svg>
@@ -353,7 +354,7 @@ export default function Header({
                   placeholder="Search projects..."
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="w-64 bg-darkCard text-sm"
+                  className="w-64 bg-card text-sm"
                 />
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-darkText w-4 h-4" />
               </form>
@@ -361,7 +362,7 @@ export default function Header({
               <Link href="/submit">
                 <Button
                   variant="outline"
-                  className="border-border hover:bg-darkCard"
+                  className="border-border hover:bg-card"
                 >
                   Submit Project
                 </Button>
@@ -396,14 +397,15 @@ export default function Header({
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full"
+                className={`rounded-full border border-border shadow transition-all duration-300 focus:ring-2 focus:ring-accent/60 bg-card hover:bg-muted`}
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               >
                 {mounted &&
                   (theme === "dark" ? (
-                    <Sun className="h-4 w-4 text-accent" />
+                    <Sun className="h-4 w-4 text-accent transition-transform duration-300 rotate-0 scale-100" />
                   ) : (
-                    <Moon className="h-4 w-4 text-accent" />
+                    <Moon className="h-4 w-4 text-accent transition-transform duration-300 rotate-0 scale-100" />
                   ))}
               </Button>
             </div>

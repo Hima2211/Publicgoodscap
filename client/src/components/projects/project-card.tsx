@@ -14,6 +14,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { CommentComposer } from "./comments/CommentComposer";
 import { CommentThread } from "./comments/CommentThread";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 
 interface Comment {
   id: number;
@@ -45,6 +46,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [upvoteAnimation, setUpvoteAnimation] = useState(false);
   const [isUpvoting, setIsUpvoting] = useState(false);
+  const [showFundModal, setShowFundModal] = useState(false);
   const { address } = useAccount();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -254,7 +256,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   const socialIcons = [];
   if (project.twitter) {
     socialIcons.push(
-      <a key="twitter" href={project.twitter} className="social-icon text-darkText hover:text-primary" aria-label="Twitter" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
+      <a key="twitter" href={project.twitter} className="social-icon text-foreground hover:text-primary" aria-label="Twitter" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
         <FaTwitter className="h-4 w-4" />
       </a>
     );
@@ -262,14 +264,14 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
   if (project.discord) {
     socialIcons.push(
-      <a key="discord" href={project.discord} className="social-icon text-darkText hover:text-primary" aria-label="Discord" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
+      <a key="discord" href={project.discord} className="social-icon text-foreground hover:text-primary" aria-label="Discord" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
         <FaDiscord className="h-4 w-4" />
       </a>
     );
   }
   if (project.telegram) {
     socialIcons.push(
-      <a key="telegram" href={project.telegram} className="social-icon text-darkText hover:text-primary" aria-label="Telegram" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
+      <a key="telegram" href={project.telegram} className="social-icon text-foreground hover:text-primary" aria-label="Telegram" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
         <FaTelegram className="h-4 w-4" />
       </a>
     );
@@ -277,7 +279,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
   if (project.github) {
     socialIcons.push(
-      <a key="github" href={project.github} className="social-icon text-darkText hover:text-primary" aria-label="GitHub" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
+      <a key="github" href={project.github} className="social-icon text-foreground hover:text-primary" aria-label="GitHub" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
         <FaGithub className="h-4 w-4" />
       </a>
     );
@@ -285,181 +287,209 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
   if (project.website) {
     socialIcons.push(
-      <a key="website" href={project.website} className="social-icon text-darkText hover:text-primary" aria-label="Website" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
+      <a key="website" href={project.website} className="social-icon text-foreground hover:text-primary" aria-label="Website" target="_blank" rel="noopener noreferrer" onClick={handleInteractionClick}>
         <FaGlobe className="h-4 w-4" />
       </a>
     );
   }
 
   return (
-    <div 
-      data-project-id={project.id}
-      onClick={handleCardClick} 
-      className="project-card bg-darkCard rounded-xl overflow-hidden border border-darkBorder shadow-card cursor-pointer hover:border-primary"
-    >
-      <div className="p-4 flex items-start gap-3">
-        <img 
-          src={project.logo} 
-          alt={`${project.name} logo`} 
-          className="w-10 h-10 rounded-lg flex-shrink-0 object-cover" 
-        />
-        
-        <div className="overflow-hidden">
-          <div className="flex items-center gap-2">
-            <h3 className="font-bold text-base text-white truncate">{project.name}</h3>
-            <span className={`badge ${categoryClass} text-xs`}>{getCategoryName(project.category)}</span>
-          </div>
-          <p className="text-darkText text-sm line-clamp-2">
-            {project.description}
-          </p>
-        </div>
-      </div>
-      
-      <div className="px-4 pb-3">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-sm text-darkText">
-            {project.inFundingRound 
-              ? `Round: ${progressPercentage === 100 ? 'Closed' : 'Open'} ${progressPercentage < 100 ? `(${progressPercentage}% funded)` : ''}`
-              : 'Round: Closed'
-            }
-          </span>
+    <div className="bg-background min-h-screen transition-colors duration-500">
+      <div 
+        data-project-id={project.id}
+        onClick={handleCardClick} 
+        className="project-card bg-card rounded-xl overflow-hidden border border-border shadow-card cursor-pointer hover:border-primary transition-colors duration-500"
+      >
+        <div className="p-4 flex items-start gap-3">
+          <img 
+            src={project.logo} 
+            alt={`${project.name} logo`} 
+            className="w-10 h-10 rounded-lg flex-shrink-0 object-cover" 
+          />
           
-          {StatusIcon && (
-            <span className={`text-sm font-medium ${statusColor} flex items-center gap-1`}>
-              <StatusIcon className="h-3.5 w-3.5" />
-              <span>{statusText}</span>
-            </span>
-          )}
-        </div>
-        <div className="progress-bar mb-3">
-          <div 
-            className={`progress-fill ${progressColorClasses}`} 
-            style={{ width: `${progressPercentage}%` }}
-          ></div>
+          <div className="overflow-hidden">
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-base text-foreground truncate">{project.name}</h3>
+              <span className={`badge ${categoryClass} text-xs text-foreground`}>{getCategoryName(project.category)}</span>
+            </div>
+            <p className="text-foreground text-sm line-clamp-2">
+              {project.description}
+            </p>
+          </div>
         </div>
         
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm">
-            <span className="text-darkText">Total Raised</span>
-            <div className="font-medium text-white">{formatCurrency(project.totalFunding)}</div>
+        <div className="px-4 pb-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-sm text-foreground">
+              {project.inFundingRound 
+                ? `Round: ${progressPercentage === 100 ? 'Closed' : 'Open'} ${progressPercentage < 100 ? `(${progressPercentage}% funded)` : ''}`
+                : 'Round: Closed'
+              }
+            </span>
+            
+            {StatusIcon && (
+              <span className={`text-sm font-medium ${statusColor} flex items-center gap-1`}>
+                <StatusIcon className="h-3.5 w-3.5" />
+                <span className="text-xs text-foreground">{statusText}</span>
+              </span>
+            )}
           </div>
-          <div className="text-sm">
-            <span className="text-darkText">Funding Sources</span>
-            <div className="font-medium text-white">
-              {project.fundingSources?.length ? project.fundingSources.join(', ') : 'None'}
+          <div className="progress-bar mb-3">
+            <div 
+              className={`progress-fill ${progressColorClasses}`} 
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
+          </div>
+          
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm">
+              <span className="text-foreground">Total Raised</span>
+              <div className="font-medium text-foreground">{formatCurrency(project.totalFunding)}</div>
+            </div>
+            <div className="text-sm">
+              <span className="text-foreground">Funding Sources</span>
+              <div className="font-medium text-foreground">
+                {project.fundingSources?.length ? project.fundingSources.join(', ') : 'None'}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      <div className="px-4 py-3 border-t border-darkBorder bg-darkCard bg-opacity-50 flex items-center justify-between interaction-section" onClick={handleInteractionClick}>
-        <div className="flex items-center gap-2">
-          <button 
-            className={`flex items-center gap-1.5 transition-colors ${isPreviewOpen ? 'text-primary' : 'text-darkText hover:text-white'}`}
-            onClick={handleCommentClick}
-          >
-            <FaComment className="h-3.5 w-3.5" />
-            <span className="text-sm">{project.commentCount || 0}</span>
-          </button>
-          <button 
-            className={`flex items-center gap-1.5 transition-colors group
-              ${project.hasUpvoted ? 'text-primary' : 'text-darkText hover:text-white'}`}
-            onClick={handleUpvote}
-          >
-            <BiUpvote 
-              className={`h-3.5 w-3.5 transition-all duration-200 ease-out
-                ${project.hasUpvoted ? 'text-primary scale-110' : 'group-hover:-translate-y-0.5'}
-                ${upvoteAnimation ? 'animate-bounce-short' : ''}`}
-            />
-            <span className="text-sm">{project.pointsCount}</span>
-          </button>
-        </div>
         
-        <div className="flex items-center gap-2">
-          <div className="flex space-x-1.5">
-            {socialIcons}
+        <div className="px-4 py-3 border-t border-border bg-card bg-opacity-50 flex items-center justify-between interaction-section transition-colors duration-500" onClick={handleInteractionClick}>
+          <div className="flex items-center gap-2">
+            <button 
+              className={`flex items-center gap-1.5 transition-colors ${isPreviewOpen ? 'text-primary' : 'text-foreground hover:text-primary'}`}
+              onClick={handleCommentClick}
+            >
+              <FaComment className="h-3.5 w-3.5" />
+              <span className="text-sm">{project.commentCount || 0}</span>
+            </button>
+            <button 
+              className={`flex items-center gap-1.5 transition-colors group
+                ${project.hasUpvoted ? 'text-primary' : 'text-foreground hover:text-primary'}`}
+              onClick={handleUpvote}
+            >
+              <BiUpvote 
+                className={`h-3.5 w-3.5 transition-all duration-200 ease-out
+                  ${project.hasUpvoted ? 'text-primary scale-110' : 'group-hover:-translate-y-0.5'}
+                  ${upvoteAnimation ? 'animate-bounce-short' : ''}`}
+              />
+              <span className="text-sm">{project.pointsCount}</span>
+            </button>
           </div>
-          <Button 
-            size="sm"
-            className={`fund-button ${
-              project.inFundingRound && progressPercentage < 100
-                ? 'bg-primary hover:bg-opacity-90'
-                : 'bg-darkCard hover:bg-opacity-90'
-            } text-white rounded-lg px-3 py-1.5 text-sm font-medium transition-colors h-7`}
-            asChild
-            onClick={handleInteractionClick}
-          >
-            <a 
-              href={project.fundingRoundLink || '#'} 
-              target="_blank" 
-              rel="noopener noreferrer"
+          
+          <div className="flex items-center gap-2">
+            <div className="flex space-x-1.5">
+              {socialIcons}
+            </div>
+            <Button 
+              size="sm"
+              className={`fund-button rounded-lg px-3 py-1.5 text-sm font-medium transition-colors h-7 border-none text-black ${project.inFundingRound && progressPercentage < 100 ? '' : ''}`}
+              style={project.inFundingRound && progressPercentage < 100 ? { background: '#c5ed5e' } : { background: '#c5ed5e', opacity: 0.7 }}
+              onClick={(e) => { e.stopPropagation(); setShowFundModal(true); }}
             >
               {project.inFundingRound && progressPercentage < 100 ? 'Fund' : 'Donate'}
-            </a>
-          </Button>
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {isPreviewOpen && (
-        <div className="border-t border-darkBorder">
-          {address ? (
-            <div className="flex gap-3 p-4">
-              <img
-                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${address}`}
-                alt="Your avatar"
-                className="w-8 h-8 rounded-full"
+        {/* Modal for Fund/Donate */}
+        <Dialog open={showFundModal} onOpenChange={setShowFundModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{Array.isArray(project.fundingSources) && project.fundingSources.length && ["gitcoin","giveth","optimism"].some(p => project.fundingSources!.includes(p)) ? "Fund via External Platform" : "Donate to Project"}</DialogTitle>
+              <DialogDescription>
+                {Array.isArray(project.fundingSources) && project.fundingSources.length && ["gitcoin","giveth","optimism"].some(p => project.fundingSources!.includes(p)) ? (
+                  <>
+                    This project is listed on {project.fundingSources!.join(", ")}.<br />
+                    You will earn <b>{project.pointsCount}</b> Points for funding.<br />
+                    Please proceed to the platform to complete your donation.
+                  </>
+                ) : (
+                  <>
+                    Donate directly with USDT, ETH, or USDC.<br />
+                    You will earn <b>{project.pointsCount}</b> Points for your donation.<br />
+                    {/* TODO: Add donation form here */}
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="secondary">Cancel</Button>
+              </DialogClose>
+              {Array.isArray(project.fundingSources) && project.fundingSources.length && ["gitcoin","giveth","optimism"].some(p => project.fundingSources!.includes(p)) ? (
+                <a href={project.fundingRoundLink || '#'} target="_blank" rel="noopener noreferrer">
+                  <Button variant="default">Proceed</Button>
+                </a>
+              ) : (
+                <Button variant="default">Donate</Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {isPreviewOpen && (
+          <div className="border-t border-darkBorder">
+            {address ? (
+              <div className="flex gap-3 p-4">
+                <img
+                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${address}`}
+                  alt="Your avatar"
+                  className="w-8 h-8 rounded-full"
+                />
+                <Button
+                  variant="ghost"
+                  className="flex-1 h-auto py-2 px-3 justify-start text-sm text-foreground hover:text-primary text-left"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowCommentComposer(true);
+                  }}
+                >
+                  Write a comment...
+                </Button>
+              </div>
+            ) : (
+              <div className="text-center py-4 text-foreground text-sm">
+                Connect your wallet to join the discussion
+              </div>
+            )}
+
+            {recentComments.map((comment) => (
+              <CommentThread
+                key={comment.id}
+                projectId={project.id}
+                comment={comment}
               />
-              <Button
-                variant="ghost"
-                className="flex-1 h-auto py-2 px-3 justify-start text-sm text-darkText hover:text-white text-left"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowCommentComposer(true);
-                }}
-              >
-                Write a comment...
-              </Button>
-            </div>
-          ) : (
-            <div className="text-center py-4 text-darkText text-sm">
-              Connect your wallet to join the discussion
-            </div>
-          )}
+            ))}
 
-          {recentComments.map((comment) => (
-            <CommentThread
-              key={comment.id}
-              projectId={project.id}
-              comment={comment}
-            />
-          ))}
+            {project.commentCount > 2 && (
+              <div className="text-center py-4">
+                <Button
+                  variant="link"
+                  className="text-primary hover:text-primary/80"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLocation(`/project/${project.id}?tab=discussion`);
+                  }}
+                >
+                  View all {project.commentCount} comments
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
-          {project.commentCount > 2 && (
-            <div className="text-center py-4">
-              <Button
-                variant="link"
-                className="text-primary hover:text-primary/80"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setLocation(`/project/${project.id}?tab=discussion`);
-                }}
-              >
-                View all {project.commentCount} comments
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
-
-      <CommentComposer
-        isOpen={showCommentComposer}
-        onClose={() => setShowCommentComposer(false)}
-        projectId={project.id}
-        onSuccess={() => {
-          setShowCommentComposer(false);
-          setIsPreviewOpen(true);
-        }}
-      />
+        <CommentComposer
+          isOpen={showCommentComposer}
+          onClose={() => setShowCommentComposer(false)}
+          projectId={project.id}
+          onSuccess={() => {
+            setShowCommentComposer(false);
+            setIsPreviewOpen(true);
+          }}
+        />
+      </div>
     </div>
   );
 }

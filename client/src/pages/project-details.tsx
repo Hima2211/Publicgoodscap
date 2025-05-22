@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { Project } from "@shared/schema";
 import { Button } from "@/components/ui/button";
@@ -21,6 +20,7 @@ import { TbCheck } from "react-icons/tb";
 import { LuClock } from "react-icons/lu";
 import ActivityFeed from "@/components/projects/activity-feed";
 import Discussion from "@/components/projects/discussion";
+import { ProjectDetailsSkeleton } from "@/components/ui/skeletons";
 
 export default function ProjectDetails() {
   const { id } = useParams();
