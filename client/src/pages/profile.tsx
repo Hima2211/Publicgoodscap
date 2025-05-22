@@ -1,4 +1,3 @@
-import { useAuth } from '../lib/auth.tsx';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,27 +11,36 @@ import { ProfileHeader } from '@/components/profile/profile-header';
 import { ProfileStats } from '@/components/profile/profile-stats';
 import { Activity } from 'lucide-react';
 import { ProfileSkeleton } from '@/components/ui/skeletons';
+import { useState, useMemo } from 'react';
 
 export default function Profile() {
-  const { user } = useAuth();
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const [, setLocation] = useLocation();
+  const [connectError, setConnectError] = useState<string | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
+  // Memoize WalletConnect connector to avoid multiple initializations
+  const walletConnectConnector = useMemo(() => walletConnect({
+    projectId: '37b5e2fccd46c838885f41186745251e',
+  }), []);
+
+  // Use address as user identifier
+  const userId = address;
 
   const { data: userProjects, isLoading } = useQuery<Project[]>({
-    queryKey: ['user-projects', user?.id],
+    queryKey: ['user-projects', userId],
     queryFn: async () => {
-      const response = await fetch(`/api/user/${user?.id}/projects`);
+      const response = await fetch(`/api/user/${userId}/projects`);
       if (!response.ok) throw new Error('Failed to fetch user projects');
       return response.json();
     },
-    enabled: !!user?.id,
+    enabled: !!userId,
   });
 
   // Fetch user stats
   const { data: fullStats, isLoading: isStatsLoading } = useQuery({
-    queryKey: ['user-stats', user?.id],
+    queryKey: ['user-stats', userId],
     queryFn: async () => {
       // TODO: Replace with actual API call
       return {
@@ -41,7 +49,7 @@ export default function Profile() {
         following: 256
       };
     },
-    enabled: !!user?.id,
+    enabled: !!userId,
   });
 
   // Format stats for components
@@ -62,28 +70,45 @@ export default function Profile() {
     return <ProfileSkeleton />;
   }
 
-  if (!user) {
+  if (!isConnected || !address) {
     return (
-      <div className="min-h-screen bg-darkBg">
+      <div className="min-h-screen bg-background transition-colors duration-500">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-          <Card className="bg-darkCard border-darkBorder">
+          <Card className="bg-card border-border text-foreground transition-colors duration-500">
             <CardHeader>
               <CardTitle>Please Connect Your Wallet</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-darkText mb-4">
+              <p className="text-foreground mb-4">
                 Connect your wallet to view your profile and manage your projects.
               </p>
+              {connectError && (
+                <div className="mb-2 text-red-500 text-sm">{connectError}</div>
+              )}
               <Button 
                 variant="default"
                 className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                onClick={() => connect({
-                  connector: walletConnect({
-                    projectId: '37b5e2fccd46c838885f41186745251e',
-                  })
-                })}
+                disabled={isConnecting}
+                onClick={async () => {
+                  setConnectError(null);
+                  setIsConnecting(true);
+                  try {
+                    const result = await connect({
+                      connector: walletConnectConnector
+                    });
+                    console.log('WalletConnect result:', result);
+                    if (result && result.error) {
+                      setConnectError(result.error.message || 'Connection failed');
+                    }
+                  } catch (err: any) {
+                    setConnectError(err?.message || 'Connection failed');
+                    console.error('WalletConnect error:', err);
+                  } finally {
+                    setIsConnecting(false);
+                  }
+                }}
               >
-                Connect Wallet
+                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
               </Button>
             </CardContent>
           </Card>
@@ -93,24 +118,24 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-darkBg">
+    <div className="min-h-screen bg-background transition-colors duration-500">
       <main className="max-w-7xl mx-auto sm:px-6">
         <div className="space-y-6 py-6">
           {/* Profile Header Card */}
-          <Card className="bg-darkCard border-darkBorder overflow-hidden">
+          <Card className="bg-card border-border text-foreground overflow-hidden transition-colors duration-500">
             <ProfileHeader 
-              user={user} 
+              user={{ address }}
               stats={socialStats} 
               onEditProfile={() => setLocation('/profile/edit')} 
             />
           </Card>
 
           {/* Profile Content Card */}
-          <Card className="bg-darkCard border-darkBorder">
+          <Card className="bg-card border-border text-foreground transition-colors duration-500">
             <CardContent className="p-6">              <ProfileStats stats={profileStats} />
 
               <Tabs defaultValue="projects" className="mt-8">
-                <TabsList className="bg-darkBg border border-darkBorder w-full justify-start">
+                <TabsList className="bg-muted border border-border w-full justify-start">
                   <TabsTrigger value="projects">Projects</TabsTrigger>
                   <TabsTrigger value="activity">Activity</TabsTrigger>
                   <TabsTrigger value="contributions">Contributions</TabsTrigger>
@@ -130,8 +155,8 @@ export default function Profile() {
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <p className="text-darkText mb-4">You haven't submitted any projects yet.</p>
-                      <Button variant="accent" asChild>
+                      <p className="text-muted-foreground mb-4">You haven't submitted any projects yet.</p>
+                      <Button variant="default" asChild>
                         <Link href="/submit">Submit a Project</Link>
                       </Button>
                     </div>
@@ -141,11 +166,11 @@ export default function Profile() {
                 <TabsContent value="activity" className="mt-6">
                   <div className="space-y-4">
                     {/* Example activity items */}
-                    <div className="flex items-start gap-4 p-4 bg-darkBg rounded-lg">
+                    <div className="flex items-start gap-4 p-4 bg-muted rounded-lg">
                       <Activity className="w-5 h-5 text-primary mt-1" />
                       <div>
-                        <p className="text-white">Contributed to Project XYZ</p>
-                        <p className="text-sm text-darkText">2 hours ago</p>
+                        <p className="text-foreground">Contributed to Project XYZ</p>
+                        <p className="text-sm text-muted-foreground">2 hours ago</p>
                       </div>
                     </div>
                     {/* Add more activity items here */}
@@ -156,12 +181,12 @@ export default function Profile() {
                   <div className="space-y-4">
                     {/* Example contribution history */}
                     <div className="grid gap-4">
-                      <div className="p-4 bg-darkBg rounded-lg">
+                      <div className="p-4 bg-muted rounded-lg">
                         <div className="flex justify-between items-center mb-2">
-                          <h3 className="text-white font-medium">Contribution to DeFi Project</h3>
+                          <h3 className="text-foreground font-medium">Contribution to DeFi Project</h3>
                           <span className="text-primary">+50 Points</span>
                         </div>
-                        <p className="text-sm text-darkText">Contributed technical feedback and testing</p>
+                        <p className="text-sm text-muted-foreground">Contributed technical feedback and testing</p>
                       </div>
                       {/* Add more contribution items here */}
                     </div>
@@ -171,8 +196,8 @@ export default function Profile() {
                 <TabsContent value="settings" className="mt-6">
                   <div className="space-y-6">
                     <div className="grid gap-4">
-                      <h3 className="text-lg font-medium text-white">Profile Settings</h3>
-                      <p className="text-darkText">Profile customization options coming soon</p>
+                      <h3 className="text-lg font-medium text-foreground">Profile Settings</h3>
+                      <p className="text-muted-foreground">Profile customization options coming soon</p>
                     </div>
                   </div>
                 </TabsContent>

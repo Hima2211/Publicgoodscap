@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,10 @@ export default function Header({
   const [mounted, setMounted] = useState(false);
   const [showSocials, setShowSocials] = useState(false);
   const [githubRepoCount, setGithubRepoCount] = useState<number | null>(null);
+
+  const walletConnectConnector = useMemo(() => walletConnect({
+    projectId: "37b5e2fccd46c838885f41186745251e",
+  }), []);
 
   // Only access theme client-side to avoid hydration mismatch
   useEffect(() => {
@@ -157,11 +161,7 @@ export default function Header({
                   size="sm"
                   className="h-6 text-xs bg-accent hover:bg-accent/90 text-darkBg font-medium"
                   onClick={() =>
-                    connect({
-                      connector: walletConnect({
-                        projectId: "37b5e2fccd46c838885f41186745251e",
-                      }),
-                    })
+                    connect({ connector: walletConnectConnector })
                   }
                 >
                   Connect Wallet
@@ -379,11 +379,7 @@ export default function Header({
                   size="icon"
                   className="rounded-full"
                   onClick={() =>
-                    connect({
-                      connector: walletConnect({
-                        projectId: "37b5e2fccd46c838885f41186745251e",
-                      }),
-                    })
+                    connect({ connector: walletConnectConnector })
                   }
                 >
                   Connect
