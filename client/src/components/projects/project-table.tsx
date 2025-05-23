@@ -64,6 +64,12 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
     setLocation(`/project/${projectId}`);
   };
 
+  // Calculate total funding
+  const totalMarketFunding = projects.reduce((sum, project) => {
+    const funding = Number(project.totalFunding ?? project.totalAmountDonatedInUsd ?? 0);
+    return sum + funding;
+  }, 0);
+
   // Sort projects by total funding amount (descending)
   const sortedProjects = [...(projects || [])].sort((a, b) => {
     const aFunding = Number((a as any).totalFunding ?? (a as any).totalAmountDonatedInUsd ?? 0);
@@ -77,6 +83,12 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
   
   return (
     <div className="mb-8 overflow-x-auto table-container">
+      <div className="flex justify-end mb-4">
+        <div className="px-4 py-2 bg-darkCard rounded-lg border border-darkBorder">
+          <span className="text-sm text-darkText">Market Volume: </span>
+          <span className="font-medium text-foreground">{formatCurrency(totalMarketFunding)}</span>
+        </div>
+      </div>
       <table className="w-full min-w-[1000px] border-collapse">
         <thead>
           <tr className="border-b border-darkBorder">
