@@ -19,6 +19,19 @@ interface HeaderProps {
   onSearchQuery?: (query: string) => void;
 }
 
+function formatCurrency(amount: number) {
+  const formattedAmount = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(amount);
+
+  const number = parseFloat(amount.toString());
+  const suffix = number >= 1000000 ? (number / 1000000).toFixed(2) + 'M' : formattedAmount;
+  return suffix;
+}
+
 export default function Header({
   onCategoryChange,
   onSearchQuery,
@@ -29,6 +42,7 @@ export default function Header({
   const [mounted, setMounted] = useState(false);
   const [showSocials, setShowSocials] = useState(false);
   const [githubRepoCount, setGithubRepoCount] = useState<number | null>(null);
+  const [project, setProject] = useState<{ totalFunding: number } | null>(null); // Added state for project and totalFunding
 
   const walletConnectConnector = useMemo(() => walletConnect({
     projectId: "37b5e2fccd46c838885f41186745251e",
@@ -52,6 +66,15 @@ export default function Header({
         }
       })
       .catch(() => setGithubRepoCount(null));
+  }, []);
+
+  useEffect(() => {
+    // Mock funding data fetch
+    // In real scenarios, fetch from your API endpoint
+    const mockFundingData = {
+      totalFunding: 65560000, // Example funding amount
+    };
+    setProject(mockFundingData);
   }, []);
 
   const navItems = [
@@ -355,14 +378,20 @@ export default function Header({
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-darkText w-4 h-4" />
               </form>
 
-              <Link href="/submit">
-                <Button
-                  variant="outline"
-                  className="border-border hover:bg-card"
-                >
-                  Submit Project
-                </Button>
-              </Link>
+              
+              <Button
+                variant="outline"
+                className="mr-4 bg-accent/10 border-accent/20 hover:bg-accent/20 text-accent font-medium"
+              >
+                Market Volume: {formatCurrency(project?.totalFunding || 0)}
+              </Button>
+              <Button
+                variant="outline"
+                className="border-border hover:bg-card"
+              >
+                Submit Project
+              </Button>
+              
 
               {isConnected ? (
                 <Button
