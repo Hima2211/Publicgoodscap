@@ -14,6 +14,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
   const [, setLocation] = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 100; // Show 100 projects per page
+  const totalPages = Math.ceil((projects?.length || 0) / itemsPerPage);
 
   const handleLinkClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click when clicking links
