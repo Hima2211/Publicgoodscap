@@ -26,11 +26,11 @@ export async function fetchKarmaProjects(): Promise<KarmaProject[]> {
     // Transform Karma data to match our Project interface
     return data.filter(project => project && project.uid).map((project: any) => ({
       id: project.uid || `karma-${Date.now()}`,
-      name: project.title || 'Untitled Project',
-      description: project.description || '',
-      logo: project.imageURL || '/placeholder-logo.png',
-      category: (project.tags?.[0]?.name || 'public_goods').toLowerCase(),
-      totalFunding: project.totalDonations || 0,
+      name: project.external?.github?.[0]?.split('/').pop() || 'Untitled Project',
+      description: project.data?.description || '',
+      logo: project.data?.imageURL || '/placeholder-logo.png',
+      category: (project.data?.category || 'public_goods').toLowerCase(),
+      totalFunding: project.grants?.[0]?.amount || 0,
       fundingSources: ['Karma'],
       website: project.links?.find((l: any) => l.type === 'website')?.url || '',
       github: project.links?.find((l: any) => l.type === 'github')?.url || '',
