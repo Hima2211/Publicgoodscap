@@ -2,6 +2,7 @@ import { Project } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { FundingChart } from './funding-chart';
+import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { FaTwitter, FaDiscord, FaGithub, FaTelegram, FaGlobe } from "react-icons/fa";
 
@@ -11,17 +12,42 @@ interface ProjectTableProps {
 
 export default function ProjectTable({ projects }: ProjectTableProps) {
   const [, setLocation] = useLocation();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 100;
 
   const handleLinkClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click when clicking links
   };
 
+  const totalPages = Math.ceil((projects?.length || 0) / itemsPerPage);
+
   // Format category display name
   const getCategoryName = (category: string) => {
     if (category === 'public_goods') return 'Public Goods';
+    if (category === 'gamefi') return 'GameFi';
+    if (category === 'ai') return 'AI';
+    if (category === 'refi') return 'ReFi';
     return category.charAt(0).toUpperCase() + category.slice(1);
   };
-  
+
+  // Format round display
+  const formatRound = (round: string) => {
+    if (!round || round === '-') return '-';
+    
+    // Check if it's an Ethereum address
+    if (/^0x[a-fA-F0-9]{40}$/.test(round)) {
+      return `${round.slice(0, 6)}...${round.slice(-4)}`;
+    }
+    
+    // Check if it's a round name (e.g. from Gitcoin)
+    if (round.includes('GR') || round.includes('round') || round.includes('Round')) {
+      return round;
+    }
+    
+    // For any other format, just return as is
+    return round;
+  };
+
   // Determine category badge style
   const categoryMap: Record<string, string> = {
     'defi': 'badge-defi',
@@ -29,15 +55,26 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
     'dao': 'badge-dao',
     'infrastructure': '',
     'public_goods': '',
-    'social': ''
+    'social': '',
+    'gamefi': 'badge-gamefi',
+    'ai': 'badge-ai',
+    'refi': 'badge-refi'
   };
 
   const handleRowClick = (projectId: string | number) => {
     setLocation(`/project/${projectId}`);
   };
 
-  // Use the projects prop directly
-  const displayProjects = projects || [];
+  // Sort projects by total funding amount (descending)
+  const sortedProjects = [...(projects || [])].sort((a, b) => {
+    const aFunding = Number(a.totalFunding ?? a.totalAmountDonatedInUsd ?? 0);
+    const bFunding = Number(b.totalFunding ?? b.totalAmountDonatedInUsd ?? 0);
+    return bFunding - aFunding;
+  });
+
+  // Get current page's projects
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const displayProjects = sortedProjects.slice(startIndex, startIndex + itemsPerPage);
   
   return (
     <div className="mb-8 overflow-x-auto table-container">
@@ -47,8 +84,8 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
             <th className="px-4 py-3 text-left text-sm font-normal text-darkText">#</th>
             <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Project</th>
             <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Total Funding</th>
-            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Category</th>
             <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Funding Status</th>
+            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Category</th>
             <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Round</th>
             <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Links</th>
             <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Funding Sources</th>
@@ -159,11 +196,10 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
               }
               const rowId = project.id;
               return (
-                <tr key={rowId} className="border-b border-darkBorder hover:bg-darkCard transition-colors cursor-pointer" onClick={() => handleRowClick(rowId)}>
-                  <td className="px-4 py-4 text-sm">{index + 1}</td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <img 
+                <tr key={rowId} className="border-b border-darkBorder hover:bg-darkCard transition-colors cursor-pointer" onClick={() => handleRowClick(rowId)}>              <td className="px-4 py-4 text-sm">#{(currentPage - 1) * itemsPerPage + index + 1}</td>
+              <td className="px-4 py-4">
+                <div className="flex items-center gap-3">
+                  <img 
                         src={logo} 
                         alt={`${name} logo`} 
                         className="w-8 h-8 rounded-md flex-shrink-0 object-cover"
@@ -182,11 +218,6 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                   </td>
                   <td className="px-4 py-4">
                     <span className="font-medium text-foreground">{formatCurrency(totalFunding)}</span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <span className={`badge ${categoryMap[category] || ''} text-xs font-normal`}>
-                      {getCategoryName(category)}
-                    </span>
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
@@ -212,8 +243,13 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                     </div>
                   </td>
                   <td className="px-4 py-4">
+                    <span className={`badge ${categoryMap[category] || ''} text-xs font-normal`}>
+                      {getCategoryName(category)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4">
                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${roundStatusClass}`}>
-                      {round || '-'}
+                      {formatRound(round)}
                     </span>
                   </td>
                   <td className="px-4 py-4">
@@ -249,6 +285,29 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
           )}
         </tbody>
       </table>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-4 mb-2">
+          <Button
+            size="sm"
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2"
+          >
+            Previous
+          </Button>
+          <span className="text-sm text-darkText">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            size="sm"
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2"
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
