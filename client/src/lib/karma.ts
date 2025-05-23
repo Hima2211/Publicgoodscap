@@ -14,8 +14,9 @@ export interface KarmaProject {
 export async function fetchKarmaProjects(): Promise<KarmaProject[]> {
   try {
     const response = await fetch('https://gapapi.karmahq.xyz/projects');
-    if (!response.ok) throw new Error('Failed to fetch Karma projects');
+    if (!response.ok) throw new Error(`Failed to fetch Karma projects: ${response.status}`);
     const data = await response.json();
+    console.log('Karma API response:', data); // Debug log
     
     // Transform Karma data to match our Project interface
     return data.map((project: any) => ({
