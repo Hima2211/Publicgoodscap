@@ -14,14 +14,6 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
   const [, setLocation] = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 100; // Show 100 projects per page
-  const [displayProjects, setDisplayProjects] = useState<Project[]>([]);
-  
-  useEffect(() => {
-    // Update displayed projects when projects prop changes
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    setDisplayProjects(sortedProjects.slice(startIndex, endIndex));
-  }, [projects, currentPage, itemsPerPage]);
 
   const handleLinkClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click when clicking links
@@ -82,7 +74,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
 
   // Get current page's projects
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const displayProjects = sortedProjects.slice(startIndex, startIndex + itemsPerPage);
+  const currentPageProjects = sortedProjects.slice(startIndex, startIndex + itemsPerPage);
   
   return (
     <div className="mb-8 overflow-x-auto table-container">
@@ -101,14 +93,14 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
           </tr>
         </thead>
         <tbody>
-          {displayProjects.length === 0 ? (
+          {currentPageProjects.length === 0 ? (
             <tr>
               <td colSpan={9} className="px-4 py-8 text-center text-darkText">
                 No projects found matching your criteria.
               </td>
             </tr>
           ) : (
-            displayProjects.map((project: any, index: number) => {
+            currentPageProjects.map((project: any, index: number) => {
               // Robust mapping for both local and Gitcoin/Karma projects
               const name = project.name || project.title || 'Untitled';
               const logo = project.logo || project.logoImageUrl || project.imageURL || '/placeholder-logo.png';
