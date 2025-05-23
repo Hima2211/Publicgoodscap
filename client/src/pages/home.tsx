@@ -241,6 +241,12 @@ export default function Home() {
           >
             {useKarma ? 'Hide Karma Projects' : 'Show Karma Projects'}
           </button>
+          <button
+            className={`px-3 py-1 rounded border text-xs font-medium transition-colors ${useGiveth ? 'bg-primary text-white' : 'bg-card text-darkText border-border'}`}
+            onClick={() => setUseGiveth((v) => !v)}
+          >
+            {useGiveth ? 'Hide Giveth Projects' : 'Show Giveth Projects'}
+          </button>
         </div>
       </div>
       
