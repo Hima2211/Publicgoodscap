@@ -15,6 +15,7 @@ import {
 import { Grid2x2Check, List } from "lucide-react";
 import { ProjectCardSkeleton } from "@/components/ui/skeletons";
 import { fetchGitcoinProjects } from "@/lib/gitcoin";
+import { fetchKarmaProjects } from "@/lib/karma";
 
 export default function Home() {
   const [view, setView] = useState<"cards" | "table">("cards");
@@ -26,6 +27,10 @@ export default function Home() {
   const [gitcoinProjects, setGitcoinProjects] = useState<any[]>([]);
   const [gitcoinLoading, setGitcoinLoading] = useState(false);
   const [gitcoinError, setGitcoinError] = useState<string | null>(null);
+  const [useKarma, setUseKarma] = useState(false);
+  const [karmaProjects, setKarmaProjects] = useState<any[]>([]);
+  const [karmaLoading, setKarmaLoading] = useState(false);
+  const [karmaError, setKarmaError] = useState<string | null>(null);
 
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["/api/projects", category, sortBy, searchQuery],
@@ -55,9 +60,40 @@ export default function Home() {
     };
   }, [useGitcoin]);
 
+  useEffect(() => {
+    let cancelled = false;
+    if (!useKarma) return;
+    if (karmaLoading) return;
+    setKarmaLoading(true);
+    setKarmaError(null);
+    fetchKarmaProjects()
+      .then((fetched) => {
+        if (!cancelled) {
+          setKarmaProjects(fetched);
+          setKarmaLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setKarmaError("Failed to fetch Karma projects");
+          setKarmaLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [useKarma]);
+
   // Calculate pagination
   const projectsPerPage = 9;
-  const allProjects = useGitcoin ? gitcoinProjects : projects;
+  let allProjects = projects;
+  if (useGitcoin && useKarma) {
+    allProjects = [...gitcoinProjects, ...karmaProjects];
+  } else if (useGitcoin) {
+    allProjects = gitcoinProjects;
+  } else if (useKarma) {
+    allProjects = karmaProjects;
+  }
   const totalPages = Math.ceil(allProjects.length / projectsPerPage);
   const startIndex = (currentPage - 1) * projectsPerPage;
   const endIndex = startIndex + projectsPerPage;
@@ -149,12 +185,18 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Gitcoin/Local Toggle Button */}
+          {/* Gitcoin/Karma/Local Toggle Buttons */}
           <button
             className={`px-3 py-1 rounded border text-xs font-medium transition-colors ${useGitcoin ? 'bg-primary text-white' : 'bg-card text-darkText border-border'}`}
             onClick={() => setUseGitcoin((v) => !v)}
           >
-            {useGitcoin ? 'Show Local Projects' : 'Show Gitcoin Projects'}
+            {useGitcoin ? 'Hide Gitcoin Projects' : 'Show Gitcoin Projects'}
+          </button>
+          <button
+            className={`px-3 py-1 rounded border text-xs font-medium transition-colors ${useKarma ? 'bg-primary text-white' : 'bg-card text-darkText border-border'}`}
+            onClick={() => setUseKarma((v) => !v)}
+          >
+            {useKarma ? 'Hide Karma Projects' : 'Show Karma Projects'}
           </button>
         </div>
       </div>
@@ -175,11 +217,17 @@ export default function Home() {
             {gitcoinError && useGitcoin && (
               <div className="col-span-full py-12 text-center text-red-500">{gitcoinError}</div>
             )}
-            {!gitcoinLoading && !gitcoinError && currentProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+            {karmaLoading && useKarma && (
+              <div className="col-span-full py-12 text-center text-darkText">Loading Karma projects...</div>
+            )}
+            {karmaError && useKarma && (
+              <div className="col-span-full py-12 text-center text-red-500">{karmaError}</div>
+            )}
+            {!gitcoinLoading && !gitcoinError && !karmaLoading && !karmaError && currentProjects.map((project) => (
+              <ProjectCard key={project.id || project.uid} project={project} />
             ))}
             
-            {currentProjects.length === 0 && !gitcoinLoading && !gitcoinError && (
+            {currentProjects.length === 0 && !gitcoinLoading && !gitcoinError && !karmaLoading && !karmaError && (
               <div className="col-span-full py-12 text-center">
                 <p className="text-darkText">No projects found matching your criteria.</p>
               </div>

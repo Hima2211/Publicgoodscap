@@ -67,8 +67,8 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
 
   // Sort projects by total funding amount (descending)
   const sortedProjects = [...(projects || [])].sort((a, b) => {
-    const aFunding = Number(a.totalFunding ?? a.totalAmountDonatedInUsd ?? 0);
-    const bFunding = Number(b.totalFunding ?? b.totalAmountDonatedInUsd ?? 0);
+    const aFunding = Number((a as any).totalFunding ?? (a as any).totalAmountDonatedInUsd ?? 0);
+    const bFunding = Number((b as any).totalFunding ?? (b as any).totalAmountDonatedInUsd ?? 0);
     return bFunding - aFunding;
   });
 
@@ -101,9 +101,9 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
             </tr>
           ) : (
             displayProjects.map((project: any, index: number) => {
-              // Robust mapping for both local and Gitcoin projects
+              // Robust mapping for both local and Gitcoin/Karma projects
               const name = project.name || project.title || 'Untitled';
-              const logo = project.logo || project.logoImageUrl || '/placeholder-logo.png';
+              const logo = project.logo || project.logoImageUrl || project.imageURL || '/placeholder-logo.png';
               const description = project.description || '';
               const totalFunding = Number(project.totalFunding ?? project.totalAmountDonatedInUsd ?? 0);
               const donatedAmount = Number(project.totalAmountDonatedInUsd ?? 0);

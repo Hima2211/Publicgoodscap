@@ -23,11 +23,14 @@ interface Category {
 
 export default function CategoryTabs({ activeCategory, onCategoryChange }: CategoryTabsProps) {
   const categories: Category[] = [
-    { id: 'all', label: 'All Projects', icon: Globe },
+    { id: 'all', label: 'All', icon: Globe },
     { id: 'defi', label: 'DeFi', icon: DollarSign },
+    { id: 'ai', label: 'AI', icon: DollarSign },
     { id: 'nft', label: 'NFT', icon: Palette },
     { id: 'dao', label: 'DAO', icon: Users },
-    { id: 'infrastructure', label: 'Infrastructure', icon: Database },
+    { id: 'game', label: 'Game', icon: Users },
+    { id: 'refi', label: 'ReFI', icon: Users },
+    { id: 'infrastructure', label: 'Infras', icon: Database },
     { id: 'public_goods', label: 'Public Goods', icon: HeartHandshake },
     { id: 'social', label: 'Social', icon: MessagesSquare }
   ];
@@ -45,7 +48,7 @@ export default function CategoryTabs({ activeCategory, onCategoryChange }: Categ
               variant={isActive ? 'default' : 'outline'}
               size="sm"
               className={`
-                h-8 md:h-10 text-xs md:text-sm px-2.5 md:px-4
+                h-8 md:h-8 text-xs md:text-sm px-2.5 md:px-4
                 ${isActive
                   ? 'bg-accent hover:bg-accent/90 text-darkBg'
                   : 'bg-darkCard hover:bg-darkCard/80 text-white hover:text-white'
