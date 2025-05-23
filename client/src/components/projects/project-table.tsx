@@ -20,8 +20,6 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
     e.stopPropagation(); // Prevent row click when clicking links
   };
 
-  const totalPages = Math.ceil((projects?.length || 0) / itemsPerPage);
-
   // Format category display name
   const getCategoryName = (category: string) => {
     if (category === 'public_goods') return 'Public Goods';
