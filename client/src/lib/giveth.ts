@@ -16,7 +16,7 @@ interface GivethProject {
 
 export async function fetchGivethProjects(): Promise<any[]> {
   try {
-    const response = await fetch('https://mainnet.serve.giveth.io/graphql', {
+    const response = await fetch('https://api.thegraph.com/subgraphs/name/giveth/giveth-economy-mainnet', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
