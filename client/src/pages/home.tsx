@@ -69,6 +69,7 @@ export default function Home() {
     fetchKarmaProjects()
       .then((fetched) => {
         if (!cancelled) {
+          console.log('Karma projects fetched:', fetched); // Debug log
           setKarmaProjects(fetched);
           setKarmaLoading(false);
         }

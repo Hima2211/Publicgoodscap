@@ -18,8 +18,13 @@ export async function fetchKarmaProjects(): Promise<KarmaProject[]> {
     const data = await response.json();
     console.log('Karma API response:', data); // Debug log
     
+    if (!Array.isArray(data)) {
+      console.error('Karma API returned unexpected data format:', data);
+      return [];
+    }
+    
     // Transform Karma data to match our Project interface
-    return data.map((project: any) => ({
+    return data.filter(project => project && project.uid).map((project: any) => ({
       id: project.uid || `karma-${Date.now()}`,
       name: project.title || 'Untitled Project',
       description: project.description || '',
