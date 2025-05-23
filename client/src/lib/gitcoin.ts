@@ -15,7 +15,7 @@ export interface GitcoinProject {
 export async function fetchGitcoinProjects({
   roundId,
   categoryTag,
-  first = 200, // Default to 200 projects to get a comprehensive list
+  first = 500, // Increased limit to fetch more projects
 }: {
   roundId?: string;
   categoryTag?: string;
