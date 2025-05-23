@@ -13,7 +13,15 @@ interface ProjectTableProps {
 export default function ProjectTable({ projects }: ProjectTableProps) {
   const [, setLocation] = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 100;
+  const itemsPerPage = 100; // Show 100 projects per page
+  const [displayProjects, setDisplayProjects] = useState<Project[]>([]);
+  
+  useEffect(() => {
+    // Update displayed projects when projects prop changes
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    setDisplayProjects(sortedProjects.slice(startIndex, endIndex));
+  }, [projects, currentPage, itemsPerPage]);
 
   const handleLinkClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row click when clicking links

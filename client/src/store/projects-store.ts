@@ -20,7 +20,7 @@ interface ProjectsState {
   setCurrentPage: (page: number) => void;
 }
 
-const PROJECTS_PER_PAGE = 9;
+const PROJECTS_PER_PAGE = 100;
 
 export const useProjectsStore = create<ProjectsState>((set, get) => ({
   projects: [],
