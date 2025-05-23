@@ -72,7 +72,7 @@ export async function fetchGitcoinProjects({
     console.log('Gitcoin API response:', data); // DEBUG LOG
     if (!data.data || !data.data.applications) return [];
     return data.data.applications
-      .filter((app: any) => app.project !== null && app.status === 'APPROVED') // Only include valid approved projects
+      .filter((app: any) => app.project !== null) // Only filter null projects, show all statuses // Only include valid approved projects
       .map((app: any) => {
         // Parse metadata from JSON string if needed
         let metadata;
