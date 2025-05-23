@@ -93,17 +93,23 @@ export async function fetchGitcoinProjects({
         
         return {
           id: app.project?.id || `gitcoin-${Date.now()}`,
-          title: metadata.title || metadata.name || 'Untitled Project',
+          name: metadata.title || metadata.name || 'Untitled Project',
           description: metadata.description || metadata.projectDescription || '',
           website: metadata.website || metadata.projectWebsite || '',
           logoImageUrl: logoUrl,
-          tags: metadata.tags || [], // Get tags from metadata if available
-          totalAmountDonatedInUsd: app.totalAmountDonatedInUsd || 0,
-          uniqueDonorsCount: app.uniqueDonorsCount || 0,
+          tags: metadata.tags || [],
+          category: metadata.tags?.[0]?.toLowerCase() || 'public_goods',
+          totalFunding: Number(app.totalAmountDonatedInUsd || 0),
+          totalAmountDonatedInUsd: Number(app.totalAmountDonatedInUsd || 0),
+          uniqueDonorsCount: Number(app.uniqueDonorsCount || 0),
           roundId: app.round?.id,
-        roundMetadata: app.round?.roundMetadata,
-        status: app.status,
-      };
+          roundMetadata: app.round?.roundMetadata,
+          status: app.status,
+          inFundingRound: app.status === 'APPROVED',
+          fundingSources: ['Gitcoin'],
+          pointsCount: Number(app.uniqueDonorsCount || 0),
+          commentCount: 0
+        };
     });
   } catch (error) {
     console.error('Error fetching Gitcoin projects:', error);
