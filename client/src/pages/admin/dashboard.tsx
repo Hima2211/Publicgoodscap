@@ -18,6 +18,10 @@ export default function AdminDashboard() {
       if (!response.ok) throw new Error("Failed to fetch projects");
       return response.json();
     },
+    // Refetch every 30 seconds to keep admin dashboard up to date
+    refetchInterval: 30000,
+    // Also refetch when window regains focus
+    refetchOnWindowFocus: true
   });
 
   if (!isAdmin || isLoading) {

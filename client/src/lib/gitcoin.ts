@@ -15,7 +15,7 @@ export interface GitcoinProject {
 export async function fetchGitcoinProjects({
   roundId,
   categoryTag,
-  first = 20,
+  first = 200, // Default to 200 projects to get a comprehensive list
 }: {
   roundId?: string;
   categoryTag?: string;
@@ -71,22 +71,36 @@ export async function fetchGitcoinProjects({
     const data = await response.json();
     console.log('Gitcoin API response:', data); // DEBUG LOG
     if (!data.data || !data.data.applications) return [];
-    return data.data.applications.map((app: any) => {
-      // Parse metadata from JSON string if needed
-      const metadata = typeof app.project.metadata === 'string' 
-        ? JSON.parse(app.project.metadata) 
-        : (app.project.metadata || {});
-      
-      return {
-        id: app.project.id,
-        title: metadata.title || '',
-        description: metadata.description || '',
-        website: metadata.website,
-        logoImageUrl: metadata.logoImg,
-        tags: metadata.tags || [], // Get tags from metadata if available
-        totalAmountDonatedInUsd: app.totalAmountDonatedInUsd,
-        uniqueDonorsCount: app.uniqueDonorsCount,
-        roundId: app.round?.id,
+    return data.data.applications
+      .filter((app: any) => app.project !== null && app.status === 'APPROVED') // Only include valid approved projects
+      .map((app: any) => {
+        // Parse metadata from JSON string if needed
+        let metadata;
+        try {
+          metadata = typeof app.project?.metadata === 'string'
+            ? JSON.parse(app.project.metadata)
+            : (app.project?.metadata || {});
+        } catch (e) {
+          console.error('Error parsing project metadata:', e);
+          metadata = app.project?.metadata || {};
+        }
+
+        // Extract logo from nested metadata structure if needed
+        const logoUrl = metadata.logoImg || metadata.logoImage || metadata.logo ||
+                       metadata.projectMetadata?.logoImg || metadata.projectMetadata?.logoImage || 
+                       metadata.projectMetadata?.logo || metadata.project?.logo ||
+                       '/placeholder-project.png';
+        
+        return {
+          id: app.project?.id || `gitcoin-${Date.now()}`,
+          title: metadata.title || metadata.name || 'Untitled Project',
+          description: metadata.description || metadata.projectDescription || '',
+          website: metadata.website || metadata.projectWebsite || '',
+          logoImageUrl: logoUrl,
+          tags: metadata.tags || [], // Get tags from metadata if available
+          totalAmountDonatedInUsd: app.totalAmountDonatedInUsd || 0,
+          uniqueDonorsCount: app.uniqueDonorsCount || 0,
+          roundId: app.round?.id,
         roundMetadata: app.round?.roundMetadata,
         status: app.status,
       };

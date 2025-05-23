@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CommentComposer } from "./comments/CommentComposer";
 import { CommentThread } from "./comments/CommentThread";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { FundingChart } from './funding-chart';
 
 interface Comment {
   id: number;
@@ -130,8 +131,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         duration: 2000,
       });
 
-      // Invalidate project data to refresh points count
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      // Invalidate both admin and regular project queries to refresh points count
+      queryClient.invalidateQueries({ queryKey: ['api/projects'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
     },
     onError: (error: Error) => {
       // Show error toast
@@ -200,7 +202,10 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     await upvoteMutation.mutateAsync();
   };
 
-  const progressPercentage = project.fundingProgress || 0;
+  // Calculate funding progress percentage
+  const progressPercentage = project.totalAmountDonatedInUsd && project.totalFunding
+    ? Math.min(100, Math.round((Number(project.totalAmountDonatedInUsd) / Number(project.totalFunding)) * 100))
+    : Number(project.fundingProgress ?? 0);
 
   let StatusIcon = null;
   let statusText = '';
@@ -214,13 +219,19 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     StatusIcon = BiTrendingUp;
     statusText = 'Trending';
     statusColor = 'text-warning';
-  } else if (project.inFundingRound && progressPercentage === 100) {
-    StatusIcon = TbCheck;
-    statusText = 'Funded';
-    statusColor = 'text-darkText';
-  } else if (!project.inFundingRound) {
+  } else if (project.inFundingRound) {
+    if (progressPercentage === 100) {
+      StatusIcon = TbCheck;
+      statusText = 'Funded';
+      statusColor = 'text-success';
+    } else {
+      StatusIcon = null; // Show progress % instead
+      statusText = '';
+      statusColor = '';
+    }
+  } else {
     StatusIcon = LuClock;
-    statusText = 'New';
+    statusText = 'Coming Soon';
     statusColor = 'text-darkText';
   }
 
@@ -248,10 +259,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
   const categoryClass = categoryMap[project.category] || '';
 
-  const getCategoryName = (category: string) => {
+  const getCategoryName = (category?: string) => {
+    if (!category) return (Array.isArray(project.tags) && project.tags[0]) || 'Uncategorized';
     if (category === 'public_goods') return 'Public Goods';
     return category.charAt(0).toUpperCase() + category.slice(1);
   };
+
+  const category = project.category || (Array.isArray(project.tags) && project.tags[0]) || 'public_goods';
 
   const socialIcons = [];
   if (project.twitter) {
@@ -302,7 +316,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       >
         <div className="p-4 flex items-start gap-3">
           <img 
-            src={project.logo} 
+            src={project.logo || project.logoImageUrl || '/placeholder-logo.png'} 
             alt={`${project.name} logo`} 
             className="w-10 h-10 rounded-lg flex-shrink-0 object-cover" 
           />
@@ -321,10 +335,17 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         <div className="px-4 pb-3">
           <div className="flex items-center justify-between mb-1">
             <span className="text-sm text-foreground">
-              {project.inFundingRound 
-                ? `Round: ${progressPercentage === 100 ? 'Closed' : 'Open'} ${progressPercentage < 100 ? `(${progressPercentage}% funded)` : ''}`
-                : 'Round: Closed'
-              }
+              {project.inFundingRound ? (
+                progressPercentage === 100 ? (
+                  'Round: Successfully Funded!'
+                ) : (
+                  `Round: Active (${progressPercentage}% funded)`
+                )
+              ) : project.roundId ? (
+                'Round: Ended'
+              ) : (
+                'Round: Not Started'
+              )}
             </span>
             
             {StatusIcon && (
@@ -338,18 +359,25 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <div 
               className={`progress-fill ${progressColorClasses}`} 
               style={{ width: `${progressPercentage}%` }}
-            ></div>
+            >
+              {progressPercentage > 0 && (
+                <div className="progress-shimmer" />
+              )}
+            </div>
           </div>
           
           <div className="flex items-center justify-between mb-2">
             <div className="text-sm">
               <span className="text-foreground">Total Raised</span>
-              <div className="font-medium text-foreground">{formatCurrency(project.totalFunding)}</div>
+              <div className="font-medium text-foreground">
+                {formatCurrency(Number(project.totalFunding ?? project.totalAmountDonatedInUsd ?? 0))}
+              </div>
             </div>
             <div className="text-sm">
               <span className="text-foreground">Funding Sources</span>
               <div className="font-medium text-foreground">
-                {project.fundingSources?.length ? project.fundingSources.join(', ') : 'None'}
+                {(project.fundingSources?.length || project.roundId) ? 
+                  (project.fundingSources?.join(', ') || (project.roundId ? 'Gitcoin' : '')) : 'None'}
               </div>
             </div>
           </div>
@@ -384,11 +412,18 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </div>
             <Button 
               size="sm"
-              className={`fund-button rounded-lg px-3 py-1.5 text-sm font-medium transition-colors h-7 border-none text-black ${project.inFundingRound && progressPercentage < 100 ? '' : ''}`}
-              style={project.inFundingRound && progressPercentage < 100 ? { background: '#c5ed5e' } : { background: '#c5ed5e', opacity: 0.7 }}
+              className={`fund-button rounded-lg px-3 py-1.5 text-sm font-medium transition-colors h-7 border-none text-black ${
+                project.inFundingRound && progressPercentage < 100 
+                  ? 'bg-[#c5ed5e] hover:bg-[#b3db4c]' 
+                  : 'bg-[#c5ed5e]/70 hover:bg-[#c5ed5e]/80'
+              }`}
               onClick={(e) => { e.stopPropagation(); setShowFundModal(true); }}
             >
-              {project.inFundingRound && progressPercentage < 100 ? 'Fund' : 'Donate'}
+              {project.inFundingRound ? (
+                progressPercentage < 100 ? 'Fund Project' : 'Round Closed'
+              ) : (
+                project.fundingSources?.length ? 'Support' : 'Coming Soon'
+              )}
             </Button>
           </div>
         </div>

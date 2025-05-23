@@ -37,7 +37,7 @@ export default function Home() {
     if (gitcoinLoading) return; // Prevent duplicate fetches
     setGitcoinLoading(true);
     setGitcoinError(null);
-    fetchGitcoinProjects({ first: 18 })
+    fetchGitcoinProjects({ first: 100 }) // Fetch more projects to ensure we don't miss important ones
       .then((fetched) => {
         if (!cancelled) {
           setGitcoinProjects(fetched);
@@ -59,9 +59,9 @@ export default function Home() {
   const projectsPerPage = 9;
   const allProjects = useGitcoin ? gitcoinProjects : projects;
   const totalPages = Math.ceil(allProjects.length / projectsPerPage);
-  const indexOfLastProject = currentPage * projectsPerPage;
-  const indexOfFirstProject = indexOfLastProject - projectsPerPage;
-  const currentProjects = allProjects.slice(indexOfFirstProject, indexOfLastProject);
+  const startIndex = (currentPage - 1) * projectsPerPage;
+  const endIndex = startIndex + projectsPerPage;
+  const currentProjects = allProjects.slice(startIndex, endIndex);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);

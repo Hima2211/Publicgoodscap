@@ -38,7 +38,9 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
       return projectId;
     },
     onSuccess: () => {
+      // Invalidate both admin and regular project queries
       queryClient.invalidateQueries({ queryKey: ['api/projects'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
       toast({
         title: "Project deleted",
         description: "The project has been successfully deleted.",

@@ -80,7 +80,9 @@ export default function EditProjectDialog({ project, open, onOpenChange }: EditP
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate both admin and regular project queries
       queryClient.invalidateQueries({ queryKey: ["api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       toast({
         title: "Project updated",
         description: "The project has been updated successfully.",

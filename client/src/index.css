@@ -192,6 +192,47 @@ html, body {
   }
 }
 
+@layer utilities {
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-150%);
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.3;
+    }
+    100% {
+      transform: translateX(150%);
+      opacity: 0;
+    }
+  }
+  
+  .progress-bar {
+    position: relative;
+    height: 0.5rem;
+    width: 100%;
+    border-radius: 9999px;
+    overflow: hidden;
+    background-color: hsl(var(--darkBorder));
+  }
+
+  .progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    transition: all 500ms ease-out;
+  }
+
+  .progress-shimmer {
+    position: absolute;
+    inset: 0;
+    opacity: 0.25;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite linear;
+  }
+}
+
 .text-foreground {
   font-weight: 400;
 }

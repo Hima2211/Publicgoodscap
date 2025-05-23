@@ -17,13 +17,17 @@ export const useWebSocket = ({
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    // Get the current port from window.location
-    const port = window.location.port;
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.hostname;
+    // Determine WebSocket URL based on environment
+    const wsUrl = process.env.NODE_ENV === 'production'
+      ? window.location.origin // Use the same origin in production
+      : `${window.location.protocol}//${window.location.hostname}:5000`; // Default to port 5000 for development
 
     // Create socket connection
-    socketRef.current = io(`${protocol}//${host}:${port}`);
+    socketRef.current = io(wsUrl, {
+      transports: ['websocket', 'polling'], // Try WebSocket first, fallback to polling
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
+    });
 
     // If we have a project ID, join that project's room
     if (projectId) {
