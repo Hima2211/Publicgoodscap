@@ -31,6 +31,10 @@ export default function Home() {
   const [karmaProjects, setKarmaProjects] = useState<any[]>([]);
   const [karmaLoading, setKarmaLoading] = useState(false);
   const [karmaError, setKarmaError] = useState<string | null>(null);
+  const [useGiveth, setUseGiveth] = useState(false);
+  const [givethProjects, setGivethProjects] = useState<any[]>([]);
+  const [givethLoading, setGivethLoading] = useState(false);
+  const [givethError, setGivethError] = useState<string | null>(null);
 
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["/api/projects", category, sortBy, searchQuery],
@@ -85,11 +89,39 @@ export default function Home() {
     };
   }, [useKarma]);
 
+  useEffect(() => {
+    let cancelled = false;
+    if (!useGiveth) return;
+    if (givethLoading) return;
+    setGivethLoading(true);
+    setGivethError(null);
+    fetchGivethProjects()
+      .then((fetched) => {
+        if (!cancelled) {
+          console.log('Giveth projects fetched:', fetched);
+          setGivethProjects(fetched);
+          setGivethLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setGivethError("Failed to fetch Giveth projects");
+          setGivethLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [useGiveth]);
+
   // Calculate pagination
   const projectsPerPage = 100; // Match store's PROJECTS_PER_PAGE
   let allProjects = useGitcoin ? [...gitcoinProjects] : [];
   if (useKarma) {
     allProjects = [...allProjects, ...karmaProjects];
+  }
+  if (useGiveth) {
+    allProjects = [...allProjects, ...givethProjects];
   }
   
   // Filter by category if needed
