@@ -86,13 +86,26 @@ export default function Home() {
 
   // Calculate pagination
   const projectsPerPage = 9;
-  let allProjects = projects;
-  if (useGitcoin && useKarma) {
-    allProjects = [...gitcoinProjects, ...karmaProjects];
-  } else if (useGitcoin) {
-    allProjects = gitcoinProjects;
-  } else if (useKarma) {
-    allProjects = karmaProjects;
+  let allProjects = [...projects];
+  if (useGitcoin) {
+    allProjects = [...allProjects, ...gitcoinProjects];
+  }
+  if (useKarma) {
+    allProjects = [...allProjects, ...karmaProjects];
+  }
+  
+  // Filter by category if needed
+  if (category !== 'all') {
+    allProjects = allProjects.filter(p => p.category === category);
+  }
+  
+  // Filter by search query if present
+  if (searchQuery) {
+    const query = searchQuery.toLowerCase();
+    allProjects = allProjects.filter(p => 
+      p.name.toLowerCase().includes(query) || 
+      p.description.toLowerCase().includes(query)
+    );
   }
   const totalPages = Math.ceil(allProjects.length / projectsPerPage);
   const startIndex = (currentPage - 1) * projectsPerPage;
