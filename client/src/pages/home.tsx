@@ -16,6 +16,7 @@ import { Grid2x2Check, List } from "lucide-react";
 import { ProjectCardSkeleton } from "@/components/ui/skeletons";
 import { fetchGitcoinProjects } from "@/lib/gitcoin";
 import { fetchKarmaProjects } from "@/lib/karma";
+import { fetchGivethProjects } from "@/lib/giveth";
 
 export default function Home() {
   const [view, setView] = useState<"cards" | "table">("cards");
