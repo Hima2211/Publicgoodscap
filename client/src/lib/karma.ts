@@ -17,31 +17,36 @@ export async function fetchKarmaProjects(): Promise<KarmaProject[]> {
     if (!response.ok) throw new Error(`Failed to fetch Karma projects: ${response.status}`);
     const data = await response.json();
     console.log('Karma API response:', data); // Debug log
-    
+
     if (!Array.isArray(data)) {
       console.error('Karma API returned unexpected data format:', data);
       return [];
     }
-    
+
     // Transform Karma data to match our Project interface
-    return data.filter(project => project && project.uid).map((project: any) => ({
-      id: project.uid || `karma-${Date.now()}`,
-      name: project.external?.github?.[0]?.split('/').pop() || 'Untitled Project',
-      description: project.data?.description || '',
-      logo: project.data?.imageURL || '/placeholder-logo.png',
-      category: (project.data?.category || 'public_goods').toLowerCase(),
-      totalFunding: project.grants?.[0]?.amount || 0,
-      fundingSources: ['Karma'],
-      website: project.links?.find((l: any) => l.type === 'website')?.url || '',
-      github: project.links?.find((l: any) => l.type === 'github')?.url || '',
-      twitter: project.links?.find((l: any) => l.type === 'twitter')?.url || '',
-      discord: project.links?.find((l: any) => l.type === 'discord')?.url || '',
-      telegram: project.links?.find((l: any) => l.type === 'telegram')?.url || '',
-      inFundingRound: true,
-      fundingProgress: 0,
-      isHot: false,
-      isTrending: false
-    }));
+    return data.filter(project => project && project.uid).map((project: any) => {
+      const githubUrl = project.external?.github?.[0] || '';
+      const githubName = githubUrl.split('/').pop() || 'Untitled Project';
+
+      return {
+        id: project.uid || `karma-${Date.now()}`,
+        name: githubName,
+        description: project.data?.description || project.description || '',
+        logo: project.data?.imageURL || project.imageURL || '/placeholder-logo.png',
+        category: (project.data?.category || 'public_goods').toLowerCase(),
+        totalFunding: Number(project.grants?.[0]?.amount || 0),
+        fundingSources: ['Karma'],
+        website: project.data?.website || project.website || githubUrl || '',
+        github: githubUrl,
+        twitter: project.links?.find((l: any) => l.type === 'twitter')?.url || '',
+        discord: project.links?.find((l: any) => l.type === 'discord')?.url || '',
+        telegram: project.links?.find((l: any) => l.type === 'telegram')?.url || '',
+        inFundingRound: true,
+        fundingProgress: 0,
+        isHot: false,
+        isTrending: false
+      };
+    });
   } catch (error) {
     console.error('Error fetching Karma projects:', error);
     return [];
