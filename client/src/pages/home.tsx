@@ -86,10 +86,7 @@ export default function Home() {
 
   // Calculate pagination
   const projectsPerPage = 100; // Match store's PROJECTS_PER_PAGE
-  let allProjects = [...projects];
-  if (useGitcoin) {
-    allProjects = [...allProjects, ...gitcoinProjects];
-  }
+  let allProjects = useGitcoin ? [...gitcoinProjects] : [];
   if (useKarma) {
     allProjects = [...allProjects, ...karmaProjects];
   }
