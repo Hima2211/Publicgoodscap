@@ -238,23 +238,42 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   let progressColorClasses = 'bg-primary';
   if (progressPercentage === 100) {
     progressColorClasses = 'bg-success';
-  } else if (project.category === 'defi') {
-    progressColorClasses = 'bg-gradient-to-r from-primary to-secondary';
-  } else if (project.category === 'nft') {
-    progressColorClasses = 'bg-gradient-to-r from-accent to-secondary';
-  } else if (project.category === 'public_goods') {
-    progressColorClasses = 'bg-gradient-to-r from-success to-primary';
-  } else if (project.category === 'social') {
-    progressColorClasses = 'bg-gradient-to-r from-accent to-primary';
+  } else {
+    switch (project.category) {
+      case 'defi':
+        progressColorClasses = 'bg-gradient-to-r from-primary to-secondary';
+        break;
+      case 'nft':
+        progressColorClasses = 'bg-gradient-to-r from-accent to-secondary';
+        break;
+      case 'public_goods':
+        progressColorClasses = 'bg-gradient-to-r from-success to-primary';
+        break;
+      case 'social':
+        progressColorClasses = 'bg-gradient-to-r from-accent to-primary';
+        break;
+      case 'gamefi':
+        progressColorClasses = 'bg-gradient-to-r from-[#FF6B6B] to-[#FF9999]';
+        break;
+      case 'ai':
+        progressColorClasses = 'bg-gradient-to-r from-[#4A90E2] to-[#87CEEB]';
+        break;
+      case 'refi':
+        progressColorClasses = 'bg-gradient-to-r from-[#50C878] to-[#98FB98]';
+        break;
+    }
   }
 
   const categoryMap: Record<string, string> = {
     'defi': 'badge-defi',
-    'nft': 'badge-nft',
+    'nft': 'badge-nft', 
     'dao': 'badge-dao',
-    'infrastructure': '',
-    'public_goods': '',
-    'social': ''
+    'infrastructure': 'badge-infrastructure',
+    'public_goods': 'badge-public-goods',
+    'social': 'badge-social',
+    'gamefi': 'badge-gamefi',
+    'ai': 'badge-ai',
+    'refi': 'badge-refi'
   };
 
   const categoryClass = categoryMap[project.category] || '';
@@ -316,9 +335,18 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       >
         <div className="p-4 flex items-start gap-3">
           <img 
-            src={project.logo || project.logoImageUrl || '/placeholder-logo.png'} 
-            alt={`${project.name} logo`} 
-            className="w-10 h-10 rounded-lg flex-shrink-0 object-cover" 
+            src={project.logo || project.logoImageUrl || getProjectLogo(project.category) || '/placeholder-logo.png'}
+            alt={`${project.name} logo`}
+            className="w-10 h-10 rounded-lg flex-shrink-0 object-cover"
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              // Try fallback to category logo, then to placeholder
+              if (!img.src.includes('placeholder-logo.png')) {
+                img.src = getProjectLogo(project.category) || '/placeholder-logo.png';
+              } else {
+                img.src = '/placeholder-logo.png';
+              }
+            }}
           />
           
           <div className="overflow-hidden">

@@ -108,5 +108,5 @@ export const ProjectStatusEnum = z.enum(['hot', 'trending', 'new', 'funded']);
 export type ProjectStatus = z.infer<typeof ProjectStatusEnum>;
 
 // Category Enum
-export const CategoryEnum = z.enum(['all', 'defi', 'nft', 'dao', 'infrastructure', 'public_goods', 'social']);
+export const CategoryEnum = z.enum(['all', 'defi', 'nft', 'dao', 'infrastructure', 'public_goods', 'social', 'gamefi', 'ai', 'refi']);
 export type Category = z.infer<typeof CategoryEnum>;
