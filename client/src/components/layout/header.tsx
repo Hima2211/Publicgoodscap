@@ -379,12 +379,7 @@ export default function Header({
               </form>
 
               
-              <Button
-                variant="outline"
-                className="mr-4 bg-accent/10 border-accent/20 hover:bg-accent/20 text-accent font-medium"
-              >
-                Market Volume: {formatCurrency(project?.totalFunding || 0)}
-              </Button>
+            
               <Button
                 variant="outline"
                 className="border-border hover:bg-card"

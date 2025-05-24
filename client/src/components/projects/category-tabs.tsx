@@ -7,7 +7,8 @@ import {
   Users, 
   Database, 
   HeartHandshake, 
-  MessagesSquare 
+  MessagesSquare,
+  Boxes
 } from "lucide-react";
 
 interface CategoryTabsProps {
@@ -24,13 +25,13 @@ interface Category {
 export default function CategoryTabs({ activeCategory, onCategoryChange }: CategoryTabsProps) {
   const categories: Category[] = [
     { id: 'all', label: 'All', icon: Globe },
+    { id: 'gitcoin', label: 'Gitcoin', icon: HeartHandshake },
+    { id: 'giveth', label: 'Giveth', icon: HeartHandshake },
+    { id: 'karma', label: 'Karma', icon: HeartHandshake },
     { id: 'defi', label: 'DeFi', icon: DollarSign },
-    { id: 'ai', label: 'AI', icon: DollarSign },
     { id: 'nft', label: 'NFT', icon: Palette },
     { id: 'dao', label: 'DAO', icon: Users },
-    { id: 'game', label: 'Game', icon: Users },
-    { id: 'refi', label: 'ReFI', icon: Users },
-    { id: 'infrastructure', label: 'Infras', icon: Database },
+    { id: 'infrastructure', label: 'Infrastructure', icon: Database },
     { id: 'public_goods', label: 'Public Goods', icon: HeartHandshake },
     { id: 'social', label: 'Social', icon: MessagesSquare }
   ];

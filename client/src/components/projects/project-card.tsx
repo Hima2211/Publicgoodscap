@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Project } from "@shared/schema";
 import { formatCurrency } from "@/lib/utils";
+import { getProjectLogo, getCategoryName } from "@/lib/project-utils";
 import { Link, useLocation } from "wouter";
 import { FaTwitter, FaDiscord, FaGithub, FaTelegram, FaGlobe, FaComment, FaRetweet } from "react-icons/fa";
 import { BiUpvote } from "react-icons/bi";
@@ -327,11 +328,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   }
 
   return (
-    <div className="bg-background min-h-screen transition-colors duration-500">
+    <div className="bg-card rounded-xl overflow-hidden border border-border shadow-card cursor-pointer hover:border-primary transition-colors duration-500">
       <div 
         data-project-id={project.id}
         onClick={handleCardClick} 
-        className="project-card bg-card rounded-xl overflow-hidden border border-border shadow-card cursor-pointer hover:border-primary transition-colors duration-500"
+        className="project-card h-full"
       >
         <div className="p-4 flex items-start gap-3">
           <img 
@@ -448,9 +449,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               onClick={(e) => { e.stopPropagation(); setShowFundModal(true); }}
             >
               {project.inFundingRound ? (
-                progressPercentage < 100 ? 'Fund Project' : 'Round Closed'
+                progressPercentage < 100 ? 'Fund' : 'Round Closed'
               ) : (
-                project.fundingSources?.length ? 'Support' : 'Coming Soon'
+                project.fundingSources?.length ? 'Fund' : 'Coming Soon'
               )}
             </Button>
           </div>

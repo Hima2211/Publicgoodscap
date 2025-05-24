@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import CategoryTabs from "@/components/projects/category-tabs";
 import ProjectCard from "@/components/projects/project-card";
@@ -40,6 +40,22 @@ export default function Home() {
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["/api/projects", category, sortBy, searchQuery],
   });
+
+  // Initialize platform states based on category
+  useEffect(() => {
+    // Enable all platforms when viewing all projects
+    if (category === 'all') {
+      setUseGitcoin(true);
+      setUseKarma(true);
+      setUseGiveth(true);
+      return;
+    }
+
+    // Enable specific platform based on category
+    setUseGitcoin(category === 'gitcoin');
+    setUseKarma(category === 'karma');
+    setUseGiveth(category === 'giveth');
+  }, [category]);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,29 +131,44 @@ export default function Home() {
     };
   }, [useGiveth]);
 
-  // Calculate pagination
-  const projectsPerPage = 100; // Match store's PROJECTS_PER_PAGE
-  let allProjects = useGitcoin ? [...gitcoinProjects] : [];
+  // Calculate pagination with both local and external projects
+  const projectsPerPage = 100;
+  let allProjects = [...projects]; // Start with local projects
+
+  // Add platform-specific projects
+  if (useGitcoin) {
+    allProjects = [...allProjects, ...gitcoinProjects.map(p => ({
+      ...p,
+      category: 'gitcoin' // Ensure category is set
+    }))];
+  }
   if (useKarma) {
-    allProjects = [...allProjects, ...karmaProjects];
+    allProjects = [...allProjects, ...karmaProjects.map(p => ({
+      ...p,
+      category: 'karma'
+    }))];
   }
   if (useGiveth) {
-    allProjects = [...allProjects, ...givethProjects];
+    allProjects = [...allProjects, ...givethProjects.map(p => ({
+      ...p,
+      category: 'giveth'
+    }))];
   }
-  
-  // Filter by category if needed
-  if (category !== 'all') {
+
+  // Filter projects 
+  // Filter by category if it's not a platform-specific category
+  if (category !== 'all' && !['gitcoin', 'giveth', 'karma'].includes(category)) {
     allProjects = allProjects.filter(p => p.category === category);
   }
   
-  // Filter by search query if present
+  // Filter by search query
   if (searchQuery) {
     const query = searchQuery.toLowerCase();
     allProjects = allProjects.filter(p => 
-      p.name.toLowerCase().includes(query) || 
-      p.description.toLowerCase().includes(query)
+      (p.name?.toLowerCase().includes(query) || p.description?.toLowerCase().includes(query))
     );
   }
+
   const totalPages = Math.ceil(allProjects.length / projectsPerPage);
   const startIndex = (currentPage - 1) * projectsPerPage;
   const endIndex = startIndex + projectsPerPage;
@@ -151,17 +182,6 @@ export default function Home() {
   if (isLoading) {
     return (
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="hidden md:block">
-            <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">Public Goods Market Cap.</h1>
-            <p className="text-foreground mt-1">Discover, track and support the ecosystem's most impactful Public goods.</p>
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-2 opacity-50">
-            <CategoryTabs activeCategory={category} onCategoryChange={setCategory} />
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <ProjectCardSkeleton key={i} />
@@ -173,7 +193,6 @@ export default function Home() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      {/* View Controls & Filters */}
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="hidden md:block">
           <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">Public Goods Market Cap.</h1>
@@ -188,6 +207,9 @@ export default function Home() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="gitcoin">Gitcoin</SelectItem>
+                <SelectItem value="giveth">Giveth</SelectItem>
+                <SelectItem value="karma">Karma</SelectItem>
                 <SelectItem value="defi">DeFi</SelectItem>
                 <SelectItem value="nft">NFT</SelectItem>
                 <SelectItem value="dao">DAO</SelectItem>
@@ -228,26 +250,6 @@ export default function Home() {
               <span className="hidden sm:inline">Table</span>
             </button>
           </div>
-
-          {/* Gitcoin/Karma/Local Toggle Buttons */}
-          <button
-            className={`px-3 py-1 rounded border text-xs font-medium transition-colors ${useGitcoin ? 'bg-primary text-white' : 'bg-card text-darkText border-border'}`}
-            onClick={() => setUseGitcoin((v) => !v)}
-          >
-            {useGitcoin ? 'Hide Gitcoin Projects' : 'Show Gitcoin Projects'}
-          </button>
-          <button
-            className={`px-3 py-1 rounded border text-xs font-medium transition-colors ${useKarma ? 'bg-primary text-white' : 'bg-card text-darkText border-border'}`}
-            onClick={() => setUseKarma((v) => !v)}
-          >
-            {useKarma ? 'Hide Karma Projects' : 'Show Karma Projects'}
-          </button>
-          <button
-            className={`px-3 py-1 rounded border text-xs font-medium transition-colors ${useGiveth ? 'bg-primary text-white' : 'bg-card text-darkText border-border'}`}
-            onClick={() => setUseGiveth((v) => !v)}
-          >
-            {useGiveth ? 'Hide Giveth Projects' : 'Show Giveth Projects'}
-          </button>
         </div>
       </div>
       
@@ -260,24 +262,21 @@ export default function Home() {
       <>
         {/* Card View */}
         {view === "cards" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {gitcoinLoading && useGitcoin && (
-              <div className="col-span-full py-12 text-center text-darkText">Loading Gitcoin projects...</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {gitcoinError && category === 'gitcoin' && (
+              <div className="col-span-full py-12 text-center text-red-500">{String(gitcoinError)}</div>
             )}
-            {gitcoinError && useGitcoin && (
-              <div className="col-span-full py-12 text-center text-red-500">{gitcoinError}</div>
+            {givethError && category === 'giveth' && (
+              <div className="col-span-full py-12 text-center text-red-500">{String(givethError)}</div>
             )}
-            {karmaLoading && useKarma && (
-              <div className="col-span-full py-12 text-center text-darkText">Loading Karma projects...</div>
+            {karmaError && category === 'karma' && (
+              <div className="col-span-full py-12 text-center text-red-500">{String(karmaError)}</div>
             )}
-            {karmaError && useKarma && (
-              <div className="col-span-full py-12 text-center text-red-500">{karmaError}</div>
-            )}
-            {!gitcoinLoading && !gitcoinError && !karmaLoading && !karmaError && currentProjects.map((project) => (
-              <ProjectCard key={project.id || project.uid} project={project} />
+            {currentProjects.map((project: Project) => (
+              <ProjectCard key={project.id || `project-${Date.now()}`} project={project} />
             ))}
             
-            {currentProjects.length === 0 && !gitcoinLoading && !gitcoinError && !karmaLoading && !karmaError && (
+            {currentProjects.length === 0 && (
               <div className="col-span-full py-12 text-center">
                 <p className="text-darkText">No projects found matching your criteria.</p>
               </div>
