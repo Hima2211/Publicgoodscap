@@ -249,7 +249,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(req.body),
       });
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Gitcoin GraphQL raw response:', text);
+        return res.status(502).json({ message: 'Invalid response from Gitcoin GraphQL', details: text });
+      }
+
       const data = await response.json();
+      if (!data || !data.data) {
+        console.error('Invalid Gitcoin GraphQL response:', data);
+        return res.status(502).json({ message: 'Invalid response structure from Gitcoin GraphQL' });
+      }
+
       res.json(data);
     } catch (error) {
       console.error('Error proxying Gitcoin GraphQL:', error);
@@ -267,17 +280,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         body: JSON.stringify(req.body),
       });
+
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const text = await response.text();
         console.error('Giveth GraphQL raw response:', text);
         return res.status(502).json({ message: 'Invalid response from Giveth GraphQL', details: text });
       }
+
       const data = await response.json();
+      if (!data || !data.data) {
+        console.error('Invalid Giveth GraphQL response:', data);
+        return res.status(502).json({ message: 'Invalid response structure from Giveth GraphQL' });
+      }
+
       res.json(data);
     } catch (error) {
       console.error('Error proxying Giveth GraphQL:', error);
-      res.status(500).json({ message: 'Failed to fetch from Giveth', error: error?.toString() });
+      res.status(500).json({ 
+        message: 'Failed to fetch from Giveth', 
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 
@@ -315,7 +338,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!data || !data.projects) throw new Error('No data from Giveth API');
 
       // Add logo field for compatibility
-      const projects = data.projects.map((project) => ({
+      const projects = data.projects.map((project: { image?: string; [key: string]: any }) => ({
         ...project,
         logo: project.image || '/placeholder-logo.png'
       }));
@@ -325,7 +348,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, count: projects.length });
     } catch (err) {
       console.error('Sync Giveth error:', err);
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
     }
   });
 
