@@ -7,25 +7,16 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAdmin, user } = useAuth();
+  const { isAdmin } = useAuth();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    // If no user is logged in, redirect to login
-    if (!user) {
-      setLocation('/admin/login');
-      return;
-    }
-    
-    // If user is logged in but not admin, show error and redirect
-    if (user && !isAdmin) {
-      console.error('Access denied: User does not have admin privileges');
+    if (!isAdmin) {
       setLocation('/admin/login');
     }
-  }, [isAdmin, user, setLocation]);
+  }, [isAdmin, setLocation]);
 
-  // Show nothing while checking auth status
-  if (!user || !isAdmin) {
+  if (!isAdmin) {
     return null;
   }
 

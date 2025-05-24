@@ -30,9 +30,9 @@ export default function AdminLogin() {
     }
     
     try {
-      const success = await login(email, password);
+      const success = await login(password); // Only pass password, not email
       if (success) {
-        setLocation('/admin');
+        setLocation('/admin/dashboard');
         toast({
           title: "Login successful",
           description: "Welcome back, admin!",

@@ -73,6 +73,13 @@ function App() {
                         </ProtectedRoute>
                       )}
                     </Route>
+                    <Route path="/admin/dashboard">
+                      {() => (
+                        <ProtectedRoute>
+                          <AdminDashboard />
+                        </ProtectedRoute>
+                      )}
+                    </Route>
                     <Route component={NotFound} />
                   </Switch>
                 </div>

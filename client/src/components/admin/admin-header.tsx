@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
+import { LogOut } from "lucide-react";
 
 export function AdminHeader() {
   const { isAdmin, logout } = useAuth();

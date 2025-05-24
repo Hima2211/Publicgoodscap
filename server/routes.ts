@@ -5,6 +5,8 @@ import { storage } from "./storage";
 import { FundingStatusEnum, ProjectStatusEnum, CategoryEnum, insertCommentSchema, insertActivitySchema } from "@shared/schema";
 import { z } from "zod";
 import fetch from 'node-fetch';
+import fs from 'fs';
+import path from 'path';
 
 interface ClientToServerEvents {
   "join-project": (projectId: number) => void;
@@ -252,6 +254,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error proxying Gitcoin GraphQL:', error);
       res.status(500).json({ message: 'Failed to fetch from Gitcoin' });
+    }
+  });
+
+  // --- Giveth Proxy Route ---
+  app.post('/api/giveth', async (req, res) => {
+    try {
+      const response = await fetch('https://impact-graph.giveth.io/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(req.body),
+      });
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Giveth GraphQL raw response:', text);
+        return res.status(502).json({ message: 'Invalid response from Giveth GraphQL', details: text });
+      }
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error('Error proxying Giveth GraphQL:', error);
+      res.status(500).json({ message: 'Failed to fetch from Giveth', error: error?.toString() });
+    }
+  });
+
+  // --- Admin: Sync Giveth Projects Route ---
+  app.post('/api/admin/sync-giveth', async (req, res) => {
+    // TODO: Add admin authentication/authorization here if needed
+    try {
+      const response = await fetch('https://impact-graph.giveth.io/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `
+            query GetProjects {
+              projects(
+                orderBy: totalDonations,
+                orderDirection: desc,
+                first: 100
+              ) {
+                id
+                title
+                description
+                image
+                slug
+                totalDonations
+                categories { name }
+                addresses { address network }
+                adminUser { name walletAddress }
+              }
+            }
+          `
+        })
+      });
+      if (!response.ok) throw new Error('Failed to fetch from Giveth');
+      const { data } = await response.json();
+      if (!data || !data.projects) throw new Error('No data from Giveth API');
+
+      // Add logo field for compatibility
+      const projects = data.projects.map((project) => ({
+        ...project,
+        logo: project.image || '/placeholder-logo.png'
+      }));
+
+      const filePath = path.join(__dirname, '../client/src/data/giveth-projects.json');
+      fs.writeFileSync(filePath, JSON.stringify(projects, null, 2));
+      res.json({ success: true, count: projects.length });
+    } catch (err) {
+      console.error('Sync Giveth error:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // --- Admin: Scrape Giveth Projects via Puppeteer Script ---
+  app.post('/api/admin/scrape-giveth-web', async (req, res) => {
+    try {
+      const { exec } = await import('child_process');
+      const scriptPath = path.join(__dirname, '../scripts/scrape-giveth.cjs');
+      exec(`node "${scriptPath}"`, (error, stdout, stderr) => {
+        if (error) {
+          console.error('Scrape Giveth error:', error, stderr);
+          return res.status(500).json({ error: stderr || error.message });
+        }
+        res.json({ success: true, output: stdout });
+      });
+    } catch (err) {
+      console.error('Scrape Giveth error:', err);
+      res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
     }
   });
 
