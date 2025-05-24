@@ -1,27 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LineChart } from "@/components/admin/line-chart";
 import ProjectsTable from "@/components/admin/projects-table";
 import StatsCards from "@/components/admin/stats-cards";
 import ImportMonitor from "@/components/admin/import-monitor";
 import { AdminHeader } from "@/components/admin/admin-header";
 import SubmitForm from "@/components/projects/submit-form";
 import { useAdminGuard } from "@/hooks/use-admin-guard";
+import type { Project } from "@shared/schema";
 
 export default function AdminDashboard() {
   const isAdmin = useAdminGuard();
-  const { data: projects, isLoading } = useQuery({
+  
+  // Fetch and combine all project data
+  const { data: projects, isLoading } = useQuery<Project[]>({
     queryKey: ["api/projects"],
     queryFn: async () => {
       const response = await fetch("/api/projects");
       if (!response.ok) throw new Error("Failed to fetch projects");
-      return response.json();
-    },
-    // Refetch every 30 seconds to keep admin dashboard up to date
-    refetchInterval: 30000,
-    // Also refetch when window regains focus
-    refetchOnWindowFocus: true
+      const projects: Project[] = await response.json();
+      return projects;
+    }
   });
 
   if (!isAdmin || isLoading) {
@@ -35,11 +34,25 @@ export default function AdminDashboard() {
     );
   }
 
+  const validProjects = projects || [];
+  
   const stats = {
-    totalProjects: projects?.length || 0,
-    activeProjects: projects?.filter((p: any) => p.inFundingRound).length || 0,
-    totalFunding: projects?.reduce((acc: number, p: any) => acc + (p.totalFunding || 0), 0) || 0,
-    averageProgress: projects?.reduce((acc: number, p: any) => acc + (p.fundingProgress || 0), 0) / projects?.length || 0,
+    totalProjects: validProjects.length,
+    // Count projects with funding > 0 or in active round
+    activeProjects: validProjects.filter(p => 
+      (p.totalFunding > 0) || p.inFundingRound
+    ).length,
+    // Sum all project funding
+    totalFunding: validProjects.reduce((sum, p) => 
+      sum + (p.totalFunding || 0), 0
+    ),
+    // Calculate average funding progress
+    averageProgress: validProjects.length ? 
+      Math.round(
+        validProjects.reduce((sum, p) => 
+          sum + (p.fundingProgress || 0), 0
+        ) / validProjects.length
+      ) : 0
   };
 
   return (
@@ -47,44 +60,28 @@ export default function AdminDashboard() {
       <AdminHeader />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="space-y-8">
-          {/* Compact Stats Section */}
-          <div className="grid gap-4">
-            <StatsCards stats={stats} />
-          </div>
-
-          {/* Main Content Tabs */}
+          <StatsCards stats={stats} />
+          
           <Card className="bg-darkCard border-darkBorder">
             <CardContent className="p-6">
-              <Tabs defaultValue="overview">
+              <Tabs defaultValue="projects">
                 <TabsList className="mb-4">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
                   <TabsTrigger value="projects">Projects</TabsTrigger>
                   <TabsTrigger value="submit">Add Project</TabsTrigger>
                   <TabsTrigger value="import">Import</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="overview" className="mt-4">
-                  <div className="space-y-4">
-                    <div>
-                      <h2 className="text-lg font-semibold text-white mb-4">Project Growth</h2>
-                      <LineChart data={[]} />
-                    </div>
-                  </div>
+                <TabsContent value="projects">
+                  <ProjectsTable projects={validProjects} />
                 </TabsContent>
 
-                <TabsContent value="projects" className="mt-4">
-                  <div className="space-y-4">
-                    <ProjectsTable projects={projects || []} />
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="submit" className="mt-4">
+                <TabsContent value="submit">
                   <div className="max-w-3xl mx-auto">
                     <SubmitForm isAdmin={true} />
                   </div>
                 </TabsContent>
 
-                <TabsContent value="import" className="mt-4">
+                <TabsContent value="import">
                   <ImportMonitor />
                 </TabsContent>
               </Tabs>
