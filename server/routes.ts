@@ -7,6 +7,7 @@ import { z } from "zod";
 import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
+import userRoutes from './routes/users';
 
 interface ClientToServerEvents {
   "join-project": (projectId: number) => void;
@@ -20,6 +21,9 @@ interface ServerToClientEvents {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Register user routes
+  app.use('/api/users', userRoutes);
+
   // Get all projects
   app.get("/api/projects", async (req, res) => {
     try {

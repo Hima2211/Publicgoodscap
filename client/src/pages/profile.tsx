@@ -11,36 +11,28 @@ import { ProfileHeader } from '@/components/profile/profile-header';
 import { ProfileStats } from '@/components/profile/profile-stats';
 import { Activity } from 'lucide-react';
 import { ProfileSkeleton } from '@/components/ui/skeletons';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
+import { useAuth } from '@/lib/auth';
+import type { User, UserStats } from '@/types/user';
 
 export default function Profile() {
-  const { connect } = useConnect();
-  const { disconnect } = useDisconnect();
-  const { isConnected, address } = useAccount();
+  const { user, isAuthenticated, isLoading: isAuthLoading, connectWallet } = useAuth();
   const [, setLocation] = useLocation();
   const [connectError, setConnectError] = useState<string | null>(null);
-  const [isConnecting, setIsConnecting] = useState(false);
-  // Memoize WalletConnect connector to avoid multiple initializations
-  const walletConnectConnector = useMemo(() => walletConnect({
-    projectId: '37b5e2fccd46c838885f41186745251e',
-  }), []);
-
-  // Use address as user identifier
-  const userId = address;
 
   const { data: userProjects, isLoading } = useQuery<Project[]>({
-    queryKey: ['user-projects', userId],
+    queryKey: ['user-projects', user?.address],
     queryFn: async () => {
-      const response = await fetch(`/api/user/${userId}/projects`);
+      const response = await fetch(`/api/users/${user?.address}/projects`);
       if (!response.ok) throw new Error('Failed to fetch user projects');
       return response.json();
     },
-    enabled: !!userId,
+    enabled: !!user?.address,
   });
 
   // Fetch user stats
-  const { data: fullStats, isLoading: isStatsLoading } = useQuery({
-    queryKey: ['user-stats', userId],
+  const { data: userStats, isLoading: isStatsLoading } = useQuery<UserStats>({
+    queryKey: ['user-stats', user?.address],
     queryFn: async () => {
       // TODO: Replace with actual API call
       return {
@@ -66,11 +58,11 @@ export default function Profile() {
     following: fullStats?.following ?? 0
   };
 
-  if (isLoading || isStatsLoading) {
+  if (isLoading || isStatsLoading || isAuthLoading) {
     return <ProfileSkeleton />;
   }
 
-  if (!isConnected || !address) {
+  if (!isAuthenticated || !user) {
     return (
       <div className="min-h-screen bg-background transition-colors duration-500">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
@@ -88,27 +80,18 @@ export default function Profile() {
               <Button 
                 variant="default"
                 className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                disabled={isConnecting}
+                disabled={isAuthLoading}
                 onClick={async () => {
                   setConnectError(null);
-                  setIsConnecting(true);
                   try {
-                    const result = await connect({
-                      connector: walletConnectConnector
-                    });
-                    console.log('WalletConnect result:', result);
-                    if (result && result.error) {
-                      setConnectError(result.error.message || 'Connection failed');
-                    }
+                    await connectWallet();
                   } catch (err: any) {
                     setConnectError(err?.message || 'Connection failed');
                     console.error('WalletConnect error:', err);
-                  } finally {
-                    setIsConnecting(false);
                   }
                 }}
               >
-                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+                {isAuthLoading ? 'Connecting...' : 'Connect Wallet'}
               </Button>
             </CardContent>
           </Card>

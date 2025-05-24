@@ -18,7 +18,7 @@ import { FaFireFlameSimple } from "react-icons/fa6";
 import { BiTrendingUp } from "react-icons/bi";
 import { TbCheck } from "react-icons/tb";
 import { LuClock } from "react-icons/lu";
-import ActivityFeed from "@/components/projects/activity-feed";
+import { ActivityFeed } from "@/components/projects/activity-feed";
 import Discussion from "@/components/projects/discussion";
 import { ProjectDetailsSkeleton } from "@/components/ui/skeletons";
 
