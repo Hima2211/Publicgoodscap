@@ -1,15 +1,21 @@
 import { Link, useLocation } from "wouter";
-import { Home, User, Trophy, TagsIcon, BookText } from "lucide-react";
+import { Compass, User, Trophy, TagsIcon, BookText, Rocket, MoreHorizontal, Settings } from "lucide-react";
 
 export default function Footer() {
   const [location] = useLocation();
 
   const navItems = [
-    { label: "Discover", href: "/", icon: Home },
+    { label: "Explore", href: "/", icon: Compass },
     { label: "Names", href: "/names", icon: TagsIcon },
     { label: "Board", href: "/leaderboard", icon: Trophy },
+    { label: "Launchpad", href: "/launchpad", icon: Rocket },
+    { label: "More", href: "/more", icon: MoreHorizontal },
+  ];
+
+  const moreMenuItems = [
     { label: "Learn", href: "/learn", icon: BookText },
-    { label: "Profile", href: "/profile", icon: User },
+    { label: "Settings", href: "/settings", icon: Settings },
+    // Add more menu items as needed
   ];
 
   return (
@@ -27,6 +33,7 @@ export default function Footer() {
                   <Link href={item.href}>
                     <a className="flex flex-col items-center p-2">
                       <Icon 
+                        strokeWidth={2.5}
                         className={`h-5 w-5 mb-1 transition-colors duration-200 ${
                           isActive ? 'text-accent' : 'text-muted-foreground'
                         }`}

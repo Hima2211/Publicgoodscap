@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Sun, Moon, Grid2x2Check, List, Compass, Trophy, BookOpen, User } from "lucide-react";
+import { Search, Sun, Moon, Grid2x2Check, List, Compass, Trophy, BookOpen, User, Rocket } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useAuth } from "@/lib/auth";
@@ -19,17 +19,10 @@ interface HeaderProps {
   onSearchQuery?: (query: string) => void;
 }
 
-function formatCurrency(amount: number) {
-  const formattedAmount = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(amount);
-
-  const number = parseFloat(amount.toString());
-  const suffix = number >= 1000000 ? (number / 1000000).toFixed(2) + 'M' : formattedAmount;
-  return suffix;
+function getAvatarUrl(seed?: string) {
+  // Use the provided seed or a random one
+  const finalSeed = seed || Math.random().toString(36).substring(7);
+  return `https://api.dicebear.com/7.x/personas/svg?seed=${finalSeed}&backgroundColor=b6e3f4`;
 }
 
 export default function Header({
@@ -45,6 +38,7 @@ export default function Header({
   const [project, setProject] = useState<{ totalFunding: number } | null>(null);
 
   const { address, isConnected } = useAccount();
+  const avatarUrl = React.useMemo(() => getAvatarUrl(address), [address]);
   const { connectAsync, connectors, isPending } = useConnect();
   const { disconnectAsync } = useDisconnect();
 
@@ -225,10 +219,25 @@ export default function Header({
                 </Button>
               )}
 
+            <Link href="/launchpad">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`h-6 w-6 rounded-full border border-border shadow transition-all duration-300 focus:ring-2 focus:ring-accent/60 bg-card hover:bg-muted overflow-hidden`}
+                aria-label="Launchpad"
+              >
+                <img 
+                  src={`https://api.dicebear.com/7.x/personas/svg?seed=${address || 'default'}&backgroundColor=b6e3f4`}
+                  alt="Profile Avatar"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </Button>
+            </Link>
+
             <Button
               variant="ghost"
               size="icon"
-              className={`rounded-full border border-border shadow transition-all duration-300 focus:ring-2 focus:ring-accent/60 bg-card hover:bg-muted`}
+              className={`h-6 w-6 rounded-full border border-border shadow transition-all duration-300 focus:ring-2 focus:ring-accent/60 bg-card hover:bg-muted`}
               aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >

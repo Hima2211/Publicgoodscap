@@ -9,6 +9,8 @@ import Profile from "@/pages/profile";
 import Names from "@/pages/names";
 import Leaderboard from "@/pages/leaderboard";
 import LearnDocs from "@/pages/learn";
+import More from "@/pages/more";
+import Launchpad from "@/pages/launchpad";
 import { ThemeProvider } from "next-themes";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -83,6 +85,8 @@ function App() {
                       <Route path="/names" component={Names} />
                       <Route path="/leaderboard" component={Leaderboard} />
                       <Route path="/learn" component={LearnDocs} />
+                      <Route path="/more" component={More} />
+                      <Route path="/launchpad" component={Launchpad} />
                       <Route path="/admin/login" component={AdminLogin} />
                       <Route path="/admin" component={() => (
                         <ProtectedRoute>

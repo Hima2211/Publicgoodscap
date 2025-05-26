@@ -41,21 +41,21 @@ export default function Profile() {
         following: 256
       };
     },
-    enabled: !!userId,
+    enabled: !!user?.address,
   });
 
   // Format stats for components
   const profileStats = {
-    totalContributions: fullStats?.totalContributions ?? 0,
+    totalContributions: userStats?.totalContributions ?? 0,
     totalPoints: 1250,
     projects: userProjects?.length ?? 0,
     impact: 25000
   };
 
   const socialStats = {
-    totalContributions: fullStats?.totalContributions ?? 0,
-    followers: fullStats?.followers ?? 0,
-    following: fullStats?.following ?? 0
+    totalContributions: userStats?.totalContributions ?? 0,
+    followers: userStats?.followers ?? 0,
+    following: userStats?.following ?? 0
   };
 
   if (isLoading || isStatsLoading || isAuthLoading) {
