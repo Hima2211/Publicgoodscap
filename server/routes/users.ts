@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { supabaseAdmin as supabase } from '../supabase';
-import { verifyToken } from '../middleware/auth';
+import { verifyWeb3Auth } from '../middleware/auth';
 
 const router = Router();
 
@@ -28,7 +28,7 @@ router.get('/:address', async (req, res) => {
 });
 
 // Update user profile
-router.patch('/:address', verifyToken, async (req, res) => {
+router.patch('/:address', verifyWeb3Auth, async (req, res) => {
   const { address } = req.params;
   const updates = req.body;
   

@@ -19,16 +19,27 @@ import AdminLogin from "@/pages/admin/login";
 import { AuthProvider } from "@/lib/auth";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 
-// Wagmi imports
-import { createConfig, WagmiConfig, http } from 'wagmi';
+import { createConfig, WagmiProvider, http } from 'wagmi';
 import { mainnet, sepolia } from 'wagmi/chains';
 import { walletConnect } from '@wagmi/connectors';
+import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 
+// Create a client
+const queryClient = new QueryClient();
+
+// Create wagmi config
 const config = createConfig({
   chains: [mainnet, sepolia],
   connectors: [
     walletConnect({
-      projectId: '37b5e2fccd46c838885f41186745251e',
+      projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || '37b5e2fccd46c838885f41186745251e',
+      metadata: {
+        name: 'YouBuidl',
+        description: 'Public Goods Platform',
+        url: window.location.origin,
+        icons: ['https://youbuidl.vercel.app/logo.png']
+      },
     }),
   ],
   transports: {
@@ -38,9 +49,15 @@ const config = createConfig({
 });
 
 function App() {
-  const { fetchProjects, setCategory, setSearchQuery, activeCategory } = useProjectsStore();
+  const { 
+    fetchProjects, 
+    setCategory, 
+    setSearchQuery, 
+    activeCategory 
+  } = useProjectsStore();
   const [location] = useLocation();
   
+  // Fetch projects on mount
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
@@ -49,48 +66,41 @@ function App() {
   
   return (
     <Router>
-      <WagmiConfig config={config}>
-        <AuthProvider>
-          <ThemeProvider defaultTheme="dark">
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <TooltipProvider>
-              <div className="flex min-h-screen flex-col">
-                {/* Only show main header on non-admin routes */}
-                {!isAdminRoute && <Header onCategoryChange={setCategory} onSearchQuery={setSearchQuery} />}
-                <div className="flex-1">
-                  <Switch>
-                    <Route path="/" component={Home} />
-                    <Route path="/project/:id" component={ProjectDetails} />
-                    <Route path="/submit" component={Submit} />
-                    <Route path="/profile" component={Profile} />
-                    <Route path="/leaderboard" component={Leaderboard} />
-                    <Route path="/names" component={Names} />
-                    <Route path="/learn" component={LearnDocs} />
-                    <Route path="/admin/login" component={AdminLogin} />
-                    <Route path="/admin">
-                      {() => (
+              <AuthProvider>
+                <div className="flex flex-col min-h-screen bg-darkBg">
+                  {/* Only show main header on non-admin routes */}
+                  {!isAdminRoute && <Header onCategoryChange={setCategory} onSearchQuery={setSearchQuery} />}
+                  <main className="flex-grow container mx-auto px-4 py-8 pb-20 md:pb-8">
+                    <Switch>
+                      <Route path="/" component={Home} />
+                      <Route path="/projects/:id" component={ProjectDetails} />
+                      <Route path="/submit" component={Submit} />
+                      <Route path="/profile/:address?" component={Profile} />
+                      <Route path="/names" component={Names} />
+                      <Route path="/leaderboard" component={Leaderboard} />
+                      <Route path="/learn" component={LearnDocs} />
+                      <Route path="/admin/login" component={AdminLogin} />
+                      <Route path="/admin" component={() => (
                         <ProtectedRoute>
                           <AdminDashboard />
                         </ProtectedRoute>
-                      )}
-                    </Route>
-                    <Route path="/admin/dashboard">
-                      {() => (
-                        <ProtectedRoute>
-                          <AdminDashboard />
-                        </ProtectedRoute>
-                      )}
-                    </Route>
-                    <Route component={NotFound} />
-                  </Switch>
+                      )} />
+                      <Route component={NotFound} />
+                    </Switch>
+                  </main>
+                  {/* Only show footer on non-admin routes */}
+                  {!isAdminRoute && <Footer />}
                 </div>
-                {/* Only show footer on non-admin routes */}
-                {!isAdminRoute && <Footer />}
-              </div>
-              <Toaster />
+              </AuthProvider>
             </TooltipProvider>
+            <Toaster />
           </ThemeProvider>
-        </AuthProvider>
-      </WagmiConfig>
+        </QueryClientProvider>
+      </WagmiProvider>
     </Router>
   );
 }

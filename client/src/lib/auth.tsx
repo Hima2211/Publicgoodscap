@@ -3,16 +3,13 @@ import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { walletConnect } from '@wagmi/connectors';
 import { BrowserProvider, Contract, parseEther } from 'ethers';
 import type { User } from '@/types/user';
-import { Web3StorageService } from './web3-storage';
+import { StorageService } from './storage-service';
 import { PassportService } from './passport-service';
 import { PROFILE_CONTRACT_ADDRESS, PROFILE_CONTRACT_ABI } from '../config/contracts';
 
-// Initialize Web3Storage service
-const web3Storage = new Web3StorageService(
-  process.env.NEXT_PUBLIC_WEB3_STORAGE_TOKEN || '',
-  PROFILE_CONTRACT_ADDRESS,
-  PROFILE_CONTRACT_ABI
-);
+// Initialize Storage service
+const storageService = new StorageService();
+const passportService = new PassportService();
 
 interface AuthContextType {
   isAdmin: boolean;
@@ -30,7 +27,7 @@ interface AuthContextType {
   verifyPassport: () => Promise<void>;
   signalProject: (projectId: string) => Promise<void>;
   supportProject: (projectId: string, amount: string) => Promise<void>;
-  getPointHistory: () => Promise<any[]>;
+  getPointHistory: () => Promise<PointHistoryItem[]>;
   getBadges: () => Promise<string[]>;
   getProjectsData: () => Promise<{
     owned: string[];
@@ -42,6 +39,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+interface PointHistoryItem {
+  points: number;
+  timestamp: number;
+  action: string;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -50,27 +53,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   });
 
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('user');
-      return saved ? JSON.parse(saved) : null;
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { address, isConnected } = useAccount();
+  const { connectAsync } = useConnect();
+  const { disconnectAsync } = useDisconnect();
+
+  const loadUserProfile = async (address: string) => {
+    try {
+      const provider = new BrowserProvider(window.ethereum);
+      const contract = new Contract(
+        PROFILE_CONTRACT_ADDRESS,
+        PROFILE_CONTRACT_ABI,
+        provider
+      );
+
+      const profileData = await contract.getProfile(address);
+      if (profileData.ipfsHash) {
+        const profileUrl = `https://gateway.pinata.cloud/ipfs/${profileData.ipfsHash}`;
+        const response = await fetch(profileUrl);
+        const userData = await response.json();
+        
+        setUser({
+          address,
+          ...userData,
+          isPassportVerified: Boolean(userData.passportScore),
+          stampCategories: {} // Initialize empty record for stamp categories
+        });
+      } else {
+        setUser({ 
+          address,
+          stampCategories: {} 
+        });
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      setUser({ 
+        address,
+        stampCategories: {} 
+      });
     }
-    return null;
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
-  const { connect } = useConnect();
-  const { disconnect } = useDisconnect();
-  const { isConnected, address } = useAccount();
-
-  const walletConnectConnector = walletConnect({
-    projectId: '37b5e2fccd46c838885f41186745251e',
-  });
+  };
 
   const connectWallet = async () => {
     setIsLoading(true);
     try {
-      await connect({ connector: walletConnectConnector });
+      const connector = walletConnect({
+        projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || '37b5e2fccd46c838885f41186745251e',
+      });
+      await connectAsync({ connector });
     } catch (error) {
       console.error('Failed to connect wallet:', error);
       throw error;
@@ -79,8 +110,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const disconnectWallet = () => {
-    disconnect();
+  const disconnectWallet = async () => {
+    await disconnectAsync();
     setUser(null);
     localStorage.removeItem('user');
   };
@@ -106,57 +137,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Update user profile
   const updateUserProfile = async (data: Partial<User>) => {
-    if (!user?.address) return;
-    
     try {
-      const cid = await web3Storage.uploadProfileData({
-        ...user,
-        ...data,
-        updatedAt: Date.now()
-      });
-      
-      setUser(prev => prev ? { ...prev, ...data } : null);
-      return cid;
-    } catch (error) {
-      console.error('Failed to update profile:', error);
-      throw error;
-    }
-  };
+      if (!user?.address) throw new Error('No user connected');
 
-  const followUser = async (address: string) => {
-    await web3Storage.followUser(address);
-    // Reload user profile to get updated following count
-    if (user?.address) {
-      await loadUserProfile(user.address);
-    }
-  };
+      const profileData = { ...user, ...data };
+      const file = new File([JSON.stringify(profileData)], 'profile.json', { type: 'application/json' });
+      const ipfsHash = await storageService.uploadFile(file);
 
-  const unfollowUser = async (address: string) => {
-    await web3Storage.unfollowUser(address);
-    // Reload user profile to get updated following count
-    if (user?.address) {
-      await loadUserProfile(user.address);
-    }
-  };
-
-  // Profile contract and passport service
-  const [profileContract, setProfileContract] = useState<Contract | null>(null);
-  const passportService = new PassportService();
-
-  // Initialize contract
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.ethereum) {
       const provider = new BrowserProvider(window.ethereum);
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(
+      const signer = await provider.getSigner();
+      const contract = new Contract(
         PROFILE_CONTRACT_ADDRESS,
         PROFILE_CONTRACT_ABI,
         signer
       );
-      setProfileContract(contract);
-    }
-  }, []);
 
+      await contract.updateProfile(ipfsHash);
+      await loadUserProfile(user.address);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
+  };
+
+  // Social functions
+  const followUser = async (address: string) => {
+    if (!user?.address) return;
+    try {
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new Contract(PROFILE_CONTRACT_ADDRESS, PROFILE_CONTRACT_ABI, signer);
+      await contract.followUser(address);
+      await loadUserProfile(user.address);
+    } catch (error) {
+      console.error('Error following user:', error);
+      throw error;
+    }
+  };
+
+  const unfollowUser = async (address: string) => {
+    if (!user?.address) return;
+    try {
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new Contract(PROFILE_CONTRACT_ADDRESS, PROFILE_CONTRACT_ABI, signer);
+      await contract.unfollowUser(address);
+      await loadUserProfile(user.address);
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
+      throw error;
+    }
+  };
+
+  // Passport verification
   const verifyPassport = async () => {
     if (!user?.address) return;
     
@@ -164,19 +197,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       const { isVerified, score, stamps } = await passportService.verifyPassport(user.address);
       
-      // Update profile contract
-      if (profileContract) {
-        await profileContract.verifyPassport(user.address, Math.floor(score * 100));
-      }
+      // Convert stamp categories array to record
+      const categories = stamps.reduce((acc, stamp) => {
+        const type = stamp.credential.type;
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
 
-      // Update local user state
-      const stampCategories = passportService.getStampCategories(stamps);
-      setUser(prev => prev ? {
-        ...prev,
-        passportScore: score,
-        isPassportVerified: isVerified,
-        stampCategories
-      } : null);
+      setUser(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          passportScore: score,
+          isPassportVerified: isVerified,
+          stampCategories: categories
+        };
+      });
 
     } catch (error) {
       console.error('Failed to verify passport:', error);
@@ -186,20 +222,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Project interaction functions
   const signalProject = async (projectId: string) => {
-    if (!user?.address || !profileContract) return;
+    if (!user?.address) return;
     
     try {
       setIsLoading(true);
-      const tx = await profileContract.signalProject(projectId);
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new Contract(PROFILE_CONTRACT_ADDRESS, PROFILE_CONTRACT_ABI, signer);
+      const tx = await contract.signalProject(projectId);
       await tx.wait();
       
-      // Update local state
       const projectsData = await getProjectsData();
-      setUser(prev => prev ? {
-        ...prev,
-        projectsSignaled: projectsData.signaled
-      } : null);
+      setUser(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          projectsSignaled: projectsData.signaled
+        };
+      });
     } catch (error) {
       console.error('Failed to signal project:', error);
       throw error;
@@ -209,24 +251,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const supportProject = async (projectId: string, amount: string) => {
-    if (!user?.address || !profileContract) return;
+    if (!user?.address) return;
     
     try {
       setIsLoading(true);
-      const tx = await profileContract.supportProject(projectId, parseEther(amount));
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new Contract(PROFILE_CONTRACT_ADDRESS, PROFILE_CONTRACT_ABI, signer);
+      const tx = await contract.supportProject(projectId, parseEther(amount));
       await tx.wait();
       
-      // Update local state
       const [projectsData, pointHistory] = await Promise.all([
         getProjectsData(),
         getPointHistory()
       ]);
       
-      setUser(prev => prev ? {
-        ...prev,
-        projectsSupported: projectsData.supported,
-        totalPoints: pointHistory.reduce((acc, action) => acc + action.points, 0)
-      } : null);
+      setUser(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          projectsSupported: projectsData.supported,
+          totalPoints: pointHistory.reduce((acc, action) => acc + action.points, 0)
+        };
+      });
     } catch (error) {
       console.error('Failed to support project:', error);
       throw error;
@@ -235,28 +282,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const getPointHistory = async () => {
-    if (!user?.address || !profileContract) return [];
-    
+  const getPointHistory = async (): Promise<PointHistoryItem[]> => {
+    if (!user?.address) return [];
     try {
-      const history = await profileContract.getPointHistory(user.address);
-      return history.actionTypes.map((type: string, i: number) => ({
-        type,
-        points: history.points[i].toNumber(),
-        timestamp: history.timestamps[i].toNumber(),
-        metadata: history.metadata[i]
+      const provider = new BrowserProvider(window.ethereum);
+      const contract = new Contract(PROFILE_CONTRACT_ADDRESS, PROFILE_CONTRACT_ABI, provider);
+      const history = await contract.getPointHistory(user.address);
+      return history.map((item: any) => ({
+        points: Number(item.points),
+        timestamp: Number(item.timestamp),
+        action: item.action
       }));
     } catch (error) {
-      console.error('Failed to get point history:', error);
+      console.error('Error fetching point history:', error);
       return [];
     }
   };
 
   const getBadges = async () => {
-    if (!user?.address || !profileContract) return [];
-    
+    if (!user?.address) return [];
     try {
-      const profile = await profileContract.getExtendedProfile(user.address);
+      const provider = new BrowserProvider(window.ethereum);
+      const contract = new Contract(PROFILE_CONTRACT_ADDRESS, PROFILE_CONTRACT_ABI, provider);
+      const profile = await contract.getExtendedProfile(user.address);
       return profile.badges || [];
     } catch (error) {
       console.error('Failed to get badges:', error);
@@ -265,14 +313,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const getProjectsData = async () => {
-    if (!user?.address || !profileContract) return { owned: [], supported: [], signaled: [] };
-    
+    if (!user?.address) return { owned: [], supported: [], signaled: [] };
     try {
-      const data = await profileContract.getProjectsData(user.address);
+      const provider = new BrowserProvider(window.ethereum);
+      const contract = new Contract(PROFILE_CONTRACT_ADDRESS, PROFILE_CONTRACT_ABI, provider);
+      const data = await contract.getProjectsData(user.address);
       return {
-        owned: data.owned,
-        supported: data.supported,
-        signaled: data.signaled
+        owned: data.owned || [],
+        supported: data.supported || [],
+        signaled: data.signaled || []
       };
     } catch (error) {
       console.error('Failed to get projects data:', error);
@@ -281,83 +330,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const calculateImpactScore = async () => {
-    if (!user?.address || !profileContract) return 0;
-    
+    if (!user?.address) return 0;
     try {
-      const profile = await profileContract.getExtendedProfile(user.address);
-      return profile.impactScore.toNumber();
+      const provider = new BrowserProvider(window.ethereum);
+      const contract = new Contract(PROFILE_CONTRACT_ADDRESS, PROFILE_CONTRACT_ABI, provider);
+      const profile = await contract.getExtendedProfile(user.address);
+      return Number(profile.impactScore) || 0;
     } catch (error) {
       console.error('Failed to calculate impact score:', error);
       return 0;
     }
   };
 
-  // Enhanced fetchUserData function
-  const fetchUserData = async (address: string) => {
-    try {
-      setIsLoading(true);
-      
-      // Fetch on-chain profile data
-      if (profileContract) {
-        const [extendedProfile, projectsData, pointHistory] = await Promise.all([
-          profileContract.getExtendedProfile(address),
-          profileContract.getProjectsData(address),
-          profileContract.getPointHistory(address)
-        ]);
-
-        // Fetch Passport data
-        const { score: passportScore, isVerified, stamps } = await passportService.verifyPassport(address);
-        
-        const userData: User = {
-          address,
-          ensName: extendedProfile.ensName,
-          passportScore,
-          isPassportVerified: isVerified,
-          stampCategories: passportService.getStampCategories(stamps),
-          totalPoints: extendedProfile.totalPoints.toNumber(),
-          totalContributions: extendedProfile.totalContributions.toNumber(),
-          impactScore: extendedProfile.impactScore.toNumber(),
-          isProjectManager: extendedProfile.isProjectManager,
-          projectsOwned: projectsData.owned,
-          projectsSupported: projectsData.supported,
-          projectsSignaled: projectsData.signaled,
-          createdAt: extendedProfile.createdAt.toNumber(),
-          updatedAt: extendedProfile.updatedAt.toNumber()
-        };
-
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Sync user data with wallet connection
+  // Effect to load user data when connected
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (isConnected && address) {
-        try {
-          const response = await fetch(`/api/users/${address}`);
-          if (response.ok) {
-            const userData = await response.json();
-            setUser({ ...userData, address });
-            localStorage.setItem('user', JSON.stringify({ ...userData, address }));
-          } else if (response.status === 404) {
-            // Create new user profile if it doesn't exist
-            const newUser: User = { address };
-            setUser(newUser);
-            localStorage.setItem('user', JSON.stringify(newUser));
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
-      }
-    };
-
-    fetchUserData();
+    if (isConnected && address) {
+      loadUserProfile(address);
+    } else {
+      setUser(null);
+    }
   }, [isConnected, address]);
 
   // Keep isAdmin in sync with localStorage
@@ -369,28 +360,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
+  const value = {
+    isAdmin,
+    login,
+    logout,
+    user,
+    isAuthenticated: isConnected && !!user,
+    isLoading,
+    connectWallet,
+    disconnectWallet,
+    setUser,
+    updateUserProfile,
+    followUser,
+    unfollowUser,
+    verifyPassport,
+    signalProject,
+    supportProject,
+    getPointHistory,
+    getBadges,
+    getProjectsData,
+    calculateImpactScore,
+  };
+
   return (
-    <AuthContext.Provider value={{
-      isAdmin,
-      login,
-      logout,
-      user,
-      isAuthenticated: isConnected && !!user,
-      isLoading,
-      connectWallet,
-      disconnectWallet,
-      setUser,
-      updateUserProfile,
-      followUser,
-      unfollowUser,
-      verifyPassport,
-      signalProject,
-      supportProject,
-      getPointHistory,
-      getBadges,
-      getProjectsData,
-      calculateImpactScore,
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

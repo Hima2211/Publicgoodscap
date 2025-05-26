@@ -1,40 +1,47 @@
 import { Link, useLocation } from "wouter";
-import { Home, Search, Send, Trophy, User } from 'lucide-react';
+import { Home, User, Trophy, TagsIcon, BookText } from "lucide-react";
 
 export default function Footer() {
   const [location] = useLocation();
-  
-  const mobileNavItems = [
-    { icon: Home, label: 'Home', href: '/' },
-    { icon: Search, label: 'Search', href: '/search' },
-    { icon: Send, label: 'Submit', href: '/submit' },
-    { icon: Trophy, label: 'Leaderboard', href: '/leaderboard' },
-    { icon: User, label: 'Profile', href: '/profile' },
+
+  const navItems = [
+    { label: "Discover", href: "/", icon: Home },
+    { label: "Names", href: "/names", icon: TagsIcon },
+    { label: "Board", href: "/leaderboard", icon: Trophy },
+    { label: "Learn", href: "/learn", icon: BookText },
+    { label: "Profile", href: "/profile", icon: User },
   ];
 
   return (
     <>
-      {/* Mobile Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border flex justify-around items-center py-2 md:hidden transition-colors duration-500">
-        <nav className="flex justify-around items-center py-2 px-4">
-          {mobileNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location === item.href;
-            return (
-              <Link 
-                key={item.href}
-                href={item.href}
-                className="flex flex-col items-center"
-              >
-                <Icon 
-                  className={`w-5 h-5 mb-1 ${isActive ? 'text-accent' : 'text-darkText'}`} 
-                />
-                <span className={`text-xs font-normal ${isActive ? 'text-accent' : 'text-darkText'}`}>
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
+      {/* Mobile Navigation Footer */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border md:hidden z-50">
+        <nav className="px-4 py-2">
+          <ul className="flex items-center justify-between">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location === item.href;
+              
+              return (
+                <li key={item.href}>
+                  <Link href={item.href}>
+                    <a className="flex flex-col items-center p-2">
+                      <Icon 
+                        className={`h-5 w-5 mb-1 transition-colors duration-200 ${
+                          isActive ? 'text-accent' : 'text-muted-foreground'
+                        }`}
+                      />
+                      <span className={`text-[10px] font-medium transition-colors duration-200 ${
+                        isActive ? 'text-accent' : 'text-muted-foreground'
+                      }`}>
+                        {item.label}
+                      </span>
+                    </a>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </nav>
       </div>
 
