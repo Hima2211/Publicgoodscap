@@ -192,21 +192,20 @@ export default function Home() {
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <main className="max-w-7xl mx-auto px-2 md:px-6 pt-0.5 md:pt-6">
+      <div className="mb-0 md:mb-4 px-0 md:px-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-0.5 md:gap-4">
         <div className="hidden md:block">
           <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">Public Goods Market Cap.</h1>
-          <p className="text-foreground mt-1">Discover, track and support the ecosystem's most impactful Public goods.</p>
+          <p className="text-foreground mt-0.5">Discover, track and support the ecosystem's most impactful Public goods.</p>
         </div>
-        
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1 md:gap-2 px-0 md:px-0">
           <div className="relative">
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="w-full md:w-32 bg-card border-border rounded-lg h-8 text-xs text-foreground transition-colors duration-500">
-                <SelectValue placeholder="All Categories" />
+              <SelectTrigger className="w-full md:w-30 bg-card border-border rounded-lg h-7 md:h-8 text-xs text-foreground transition-colors duration-500">
+                <SelectValue placeholder="Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="all">Categories</SelectItem>
                 <SelectItem value="gitcoin">Gitcoin</SelectItem>
                 <SelectItem value="giveth">Giveth</SelectItem>
                 <SelectItem value="karma">Karma</SelectItem>
@@ -222,11 +221,11 @@ export default function Home() {
           
           <div className="relative">
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full md:w-36 bg-card border-border rounded-lg h-8 text-xs text-foreground transition-colors duration-500">
-                <SelectValue placeholder="Sort by: Trending" />
+              <SelectTrigger className="w-full md:w-36 bg-card border-border rounded-lg h-7 md:h-8 text-xs text-foreground transition-colors duration-500">
+                <SelectValue placeholder="Trending" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="trending">Sort by: Trending</SelectItem>
+                <SelectItem value="trending">Trending</SelectItem>
                 <SelectItem value="total_funding">Total Funding</SelectItem>
                 <SelectItem value="recently_added">Recently Added</SelectItem>
                 <SelectItem value="most_supported">Most Supported</SelectItem>
@@ -234,30 +233,41 @@ export default function Home() {
             </Select>
           </div>
           
-          <div className="flex border border-border rounded-lg overflow-hidden">
+          <div className="flex border border-border rounded-lg overflow-hidden h-7 md:h-8">
             <button 
-              className={`px-3 py-2 text-sm flex items-center gap-1 ${view === 'cards' ? 'bg-card text-foreground' : 'bg-background text-foreground'} transition-colors duration-500`}
+              className={`px-2 md:px-3 py-1.5 md:py-2 text-xs flex items-center gap-1 ${view === 'cards' ? 'bg-card text-foreground' : 'bg-background text-foreground'} transition-colors duration-500`}
               onClick={() => setView("cards")}
             >
-              <Grid2x2Check className={`h-4 w-4 ${view === 'cards' ? 'text-primary' : 'text-darkText'}`} />
+              <Grid2x2Check className={`h-3.5 w-3.5 md:h-4 md:w-4 ${view === 'cards' ? 'text-primary' : 'text-darkText'}`} />
               <span className="hidden sm:inline">Cards</span>
             </button>
             <button 
-              className={`px-3 py-2 text-sm flex items-center gap-1 ${view === 'table' ? 'bg-card text-foreground' : 'bg-background text-foreground'} transition-colors duration-500`}
+              className={`px-2 md:px-3 py-1.5 md:py-2 text-xs flex items-center gap-1 ${view === 'table' ? 'bg-card text-foreground' : 'bg-background text-foreground'} transition-colors duration-500`}
               onClick={() => setView("table")}
             >
-              <List className={`h-4 w-4 ${view === 'table' ? 'text-primary' : 'text-darkText'}`} />
+              <List className={`h-3.5 w-3.5 md:h-4 md:w-4 ${view === 'table' ? 'text-primary' : 'text-darkText'}`} />
               <span className="hidden sm:inline">Table</span>
             </button>
           </div>
         </div>
       </div>
       
-      {/* Category Tabs - Only visible on desktop */}
+      {/* Market Volume button - visible on mobile above tabs, on desktop in controls */}
+      <div className="flex md:hidden justify-end mb-1 px-2">
+        <div className="px-3 py-1.5 bg-darkCard rounded-lg border border-darkBorder">
+                    <span className="text-sm text-foreground">{/* TODO: Insert total market funding value here, e.g. formatCurrency(totalMarketFunding) */}</span>
+        </div>
+      </div>
+      {/* Category Tabs - Only visible on desktop, no margin, no mobile scrollbar */}
       <div className="hidden md:block">
+        <div className="flex justify-end mb-2 px-4">
+          <div className="px-3 py-1.5 bg-darkCard rounded-lg border border-darkBorder">
+            <span className="text-xs text-darkText">Market Volume: </span>
+            <span className="text-sm text-foreground">{/* TODO: Insert total market funding value here, e.g. formatCurrency(totalMarketFunding) */}</span>
+          </div>
+        </div>
         <CategoryTabs activeCategory={category} onCategoryChange={setCategory} />
       </div>
-      
       {/* Projects Display */}
       <>
         {/* Card View */}

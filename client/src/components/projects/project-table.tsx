@@ -82,31 +82,31 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
   const currentPageProjects = sortedProjects.slice(startIndex, startIndex + itemsPerPage);
   
   return (
-    <div className="mb-8 overflow-x-auto table-container">
-      <div className="flex justify-end mb-4">
-        <div className="px-4 py-2 bg-darkCard rounded-lg border border-darkBorder">
-          <span className="text-sm text-darkText">Market Volume: </span>
-          <span className="font-medium text-foreground">{formatCurrency(totalMarketFunding)}</span>
+    <div className="mb-4 overflow-x-auto table-container -mx-4 md:mx-0">
+      <div className="flex justify-end mb-2 px-4">
+        <div className="px-3 py-1.5 bg-darkCard rounded-lg border border-darkBorder">
+          <span className="text-xs text-darkText">Market Volume: </span>
+          <span className="text-sm text-foreground">{formatCurrency(totalMarketFunding)}</span>
         </div>
       </div>
-      <table className="w-full min-w-[1000px] border-collapse">
+      <table className="w-full border-collapse">
         <thead>
           <tr className="border-b border-darkBorder">
-            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">#</th>
-            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Project</th>
-            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Total Funding</th>
-            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Funding Status</th>
-            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Category</th>
-            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Round</th>
-            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Links</th>
-            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Funding Sources</th>
-            <th className="px-4 py-3 text-left text-sm font-normal text-darkText">Actions</th>
+            <th className="px-2 md:px-3 py-1.5 md:py-2 text-left text-xs font-normal text-darkText">#</th>
+            <th className="px-2 md:px-3 py-1.5 md:py-2 text-left text-xs font-normal text-darkText">Project</th>
+            <th className="px-2 md:px-3 py-1.5 md:py-2 text-left text-xs font-normal text-darkText">Total Funding</th>
+            <th className="px-2 md:px-3 py-1.5 md:py-2 text-left text-xs font-normal text-darkText">Funding Status</th>
+            <th className="px-2 md:px-3 py-1.5 md:py-2 text-left text-xs font-normal text-darkText">Category</th>
+            <th className="px-2 md:px-3 py-1.5 md:py-2 text-left text-xs font-normal text-darkText">Round</th>
+            <th className="px-2 md:px-3 py-1.5 md:py-2 text-left text-xs font-normal text-darkText">Links</th>
+            <th className="px-2 md:px-3 py-1.5 md:py-2 text-left text-xs font-normal text-darkText">Funding Sources</th>
+            <th className="px-2 md:px-3 py-1.5 md:py-2 text-left text-xs font-normal text-darkText">Actions</th>
           </tr>
         </thead>
         <tbody>
           {currentPageProjects.length === 0 ? (
             <tr>
-              <td colSpan={9} className="px-4 py-8 text-center text-darkText">
+              <td colSpan={9} className="px-2 md:px-4 py-8 text-center text-darkText">
                 No projects found matching your criteria.
               </td>
             </tr>
@@ -207,13 +207,18 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
               }
               const rowId = project.id;
               return (
-                <tr key={rowId} className="border-b border-darkBorder hover:bg-darkCard transition-colors cursor-pointer" onClick={() => handleRowClick(rowId)}>              <td className="px-4 py-4 text-sm">#{(currentPage - 1) * itemsPerPage + index + 1}</td>
-              <td className="px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <img 
+                <tr key={rowId} 
+                    className="border-b border-darkBorder hover:bg-darkCard/50" 
+                    onClick={() => handleRowClick(rowId)}>
+                  <td className="px-2 md:px-3 py-2 text-sm font-normal">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
+                  <td className="px-2 md:px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <img 
                         src={logo} 
                         alt={`${name} logo`} 
-                        className="w-8 h-8 rounded-md flex-shrink-0 object-cover"
+                        className="w-6 h-6 md:w-8 md:h-8 rounded-md flex-shrink-0 object-cover"
                         onError={(e) => {
                           const img = e.target as HTMLImageElement;
                           if (!img.src.includes('/placeholder-logo.png')) {
@@ -221,20 +226,17 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                           }
                         }}
                       />
-                      <div>
-                        <h3 className="font-bold text-white">{name}</h3>
-                        <p className="text-xs font-normal text-darkText truncate max-w-[200px]">{description}</p>
-                      </div>
+                      <span className="text-sm font-normal">{name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4">
-                    <span className="font-medium text-foreground">{formatCurrency(totalFunding)}</span>
+                  <td className="px-2 md:px-3 py-2">
+                    <span className="text-sm font-normal">{formatCurrency(totalFunding)}</span>
                   </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-[120px] h-[40px]">
+                  <td className="px-2 md:px-3 py-2">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <div className="w-[100px] md:w-[120px] h-[30px] md:h-[40px]">
                         <FundingChart 
-                          data={graphData}
+                          data={graphData} 
                           gradientFrom={
                             (() => {
                               if (!totalFunding) return '#666';
@@ -247,37 +249,55 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
                               if (fundedRatio >= 0.3) return '#a552f7';     // 30-49% funded - Purple
                               return '#ea3943';                             // < 30% funded - Red
                             })()
-                          }
+                          } 
                           gradientTo="rgba(22, 21, 34, 0.1)"               // Transparent dark for all
                         />
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4">
-                    <span className={`badge ${categoryMap[category] || ''} text-xs font-normal`}>
+                  <td className="px-2 md:px-3 py-2">
+                    <span className={`badge ${categoryMap[category] || ''} text-[10px] md:text-xs font-normal`}>
                       {getCategoryName(category)}
                     </span>
                   </td>
-                  <td className="px-4 py-4">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${roundStatusClass}`}>
+                  <td className="px-2 md:px-3 py-2">
+                    <span className={`inline-flex items-center px-1.5 md:px-2 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-medium ${roundStatusClass}`}>
                       {formatRound(round)}
                     </span>
                   </td>
-                  <td className="px-4 py-4">
-                    <div className="flex space-x-2">
-                      {socialIcons}
+                  <td className="px-2 md:px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      {project.website_url && (
+                        <a
+                          href={project.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:text-primary/80"
+                        >
+                          <FaGlobe className="h-4 w-4" />
+                        </a>
+                      )}
+                      {project.twitter_url && (
+                        <a
+                          href={project.twitter_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:text-primary/80"
+                        >
+                          <FaTwitter className="h-4 w-4" />
+                        </a>
+                      )}
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-sm">
-                    {fundingSources.length > 0 
-                      ? fundingSources.join(', ') 
-                      : '-'
-                    }
+                  <td className="px-2 md:px-3 py-2">
+                    <div className="flex items-center gap-1.5">
+                      {fundingSources.length > 0 ? fundingSources.join(', ') : '-'}
+                    </div>
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="px-2 md:px-3 py-2">
                     <Button
                       size="sm"
-                      className={`bg-primary text-white rounded-lg px-3 py-1.5 text-xs font-medium transition-colors h-8`}
+                      className="bg-primary text-white rounded-lg px-2 md:px-3 py-1 md:py-1.5 text-[10px] md:text-xs font-medium transition-colors h-6 md:h-8"
                       asChild
                     >
                       <a 
@@ -296,6 +316,7 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
           )}
         </tbody>
       </table>
+
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-4 mb-2">
           <Button
